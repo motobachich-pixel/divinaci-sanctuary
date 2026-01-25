@@ -97,11 +97,9 @@ export default function Home() {
           addMessage({ id: crypto.randomUUID(), role: "assistant", content: text });
         }
       } else {
-        // JSON fallback with rich content support
-        const data = await res.json().catch(() => ({ message: "" }));
-        const content = data?.message ?? "";
-        const richContent = data?.richContent;
-        addMessage({ id: crypto.randomUUID(), role: "assistant", content, richContent });
+        // Fallback: treat as text
+        const text = await res.text();
+        addMessage({ id: crypto.randomUUID(), role: "assistant", content: text });
       }
     } catch (e) {
       addMessage({ id: crypto.randomUUID(), role: "assistant", content: "…" });
