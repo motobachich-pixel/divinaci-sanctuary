@@ -31,10 +31,31 @@ export default function Home() {
     setMessages((prev) => [...prev, msg]);
   };
 
+  const detectLanguageFromText = (text: string): string => {
+    const frenchWords = /\b(je|tu|il|elle|nous|vous|ils|elles|le|la|les|un|une|des|du|de|et|ou|mais|donc|pour|qui|que|avec|par|à|dans|sans)\b/i;
+    const spanishWords = /\b(yo|tú|él|ella|nosotros|vosotros|ellos|ellas|el|la|los|las|un|una|unos|unas|de|y|o|pero|porque|para|quien|que|con|por|a|en|sin)\b/i;
+    const germanWords = /\b(ich|du|er|sie|es|wir|ihr|sie|der|die|das|den|dem|des|ein|eine|einem|einen|einer|eines|und|oder|aber|weil|da|um|zu|mit|von|in|zu|für)\b/i;
+    const italianWords = /\b(io|tu|lui|lei|noi|voi|loro|il|lo|la|i|gli|le|un|una|uno|di|e|o|ma|perché|per|chi|che|con|da|in|a|su)\b/i;
+    const portugueseWords = /\b(eu|tu|ele|ela|nós|vós|eles|elas|o|a|os|as|um|uma|uns|umas|de|e|ou|mas|porque|para|quem|que|com|por|em|a|sem)\b/i;
+    const japaneseChars = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/;
+
+    if (japaneseChars.test(text)) return "ja";
+    if (germanWords.test(text)) return "de";
+    if (spanishWords.test(text)) return "es";
+    if (italianWords.test(text)) return "it";
+    if (portugueseWords.test(text)) return "pt";
+    if (frenchWords.test(text)) return "fr";
+    return "en";
+  };
+
   const sendIntent = async () => {
     const trimmed = intent.trim();
     if (!trimmed || loading) return;
     setLoading(true);
+
+    // Detect language from user input
+    const detectedLang = detectLanguageFromText(trimmed);
+    setLanguage(detectedLang);
 
     const userMsg: ChatMsg = {
       id: crypto.randomUUID(),
@@ -80,8 +101,6 @@ export default function Home() {
         const data = await res.json().catch(() => ({ message: "" }));
         const content = data?.message ?? "";
         const richContent = data?.richContent;
-        const detectedLanguage = data?.language ?? language;
-        setLanguage(detectedLanguage);
         addMessage({ id: crypto.randomUUID(), role: "assistant", content, richContent });
       }
     } catch (e) {
@@ -156,7 +175,7 @@ export default function Home() {
                   ${m.role === "user" ? "text-gray-400 text-right opacity-70" : "text-[#C5A059] opacity-80"}
                 `}
               >
-                <p className={`${m.role === "user" ? `${montserrat.className}` : cinzel.className} text-sm sm:text-base md:text-lg leading-relaxed font-light break-words`}>
+                <p className={`${m.role === "user" ? `${montserrat.className}` : cinzel.className} text-sm sm:text-base md:text-lg leading-relaxed font-light break-words message-text`}>
                   {m.content}
                 </p>
                 {m.richContent && m.role === "assistant" && (

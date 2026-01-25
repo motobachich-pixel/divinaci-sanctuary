@@ -162,8 +162,7 @@ export async function POST(req: Request): Promise<Response> {
         temperature: 0.7,
       });
       const content = completion.choices?.[0]?.message?.content ?? "";
-      const detectedLanguage = detectLanguage(userMessage || content);
-      return new Response(JSON.stringify({ message: content, language: detectedLanguage }), {
+      return new Response(JSON.stringify({ message: content }), {
         status: 200,
         headers: { "content-type": "application/json" },
       });

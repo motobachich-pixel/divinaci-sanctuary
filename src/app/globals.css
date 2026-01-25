@@ -67,6 +67,15 @@ body {
   animation: fadeIn 1s ease-out;
 }
 
+/* Lowercase with first letter uppercase for messages */
+.message-text {
+  text-transform: lowercase;
+}
+
+.message-text::first-letter {
+  text-transform: uppercase;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #d4b86b;
 }
