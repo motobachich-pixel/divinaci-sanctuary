@@ -90,107 +90,182 @@ export default function Chat() {
           left: 0;
           top: 0;
           height: 100vh;
-          width: clamp(8vmin, 15vmin, 200px);
-          background: rgba(5, 5, 5, 0.95);
-          backdrop-filter: blur(10px);
-          border-right: 1px solid rgba(197, 160, 89, 0.2);
+          width: clamp(220px, 18vw, 280px);
+          background: linear-gradient(180deg, rgba(10, 8, 5, 0.98) 0%, rgba(5, 5, 5, 0.95) 100%);
+          backdrop-filter: blur(20px);
+          border-right: 1px solid rgba(197, 160, 89, 0.15);
           z-index: 100;
-          transition: transform 0.3s ease;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           transform: translateX(0);
-          padding-top: 2rem;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          gap: 2rem;
+          box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
         }
         .sidebar.collapsed {
           transform: translateX(-100%);
         }
-        .sidebar-logo {
-          writing-mode: vertical-rl;
-          text-orientation: mixed;
-          font-size: clamp(0.7rem, 2vmin, 1rem);
-          font-weight: 100;
-          letter-spacing: 0.15em;
-          color: #C5A059;
-          opacity: 0.7;
-          transform: rotate(180deg);
-          white-space: nowrap;
-          animation: slideInLeft 0.5s ease;
+        .sidebar-header {
+          padding: 1.5rem 1rem 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          border-bottom: 1px solid rgba(197, 160, 89, 0.1);
         }
-        .sidebar-button {
-          width: clamp(6vmin, 12vmin, 150px);
-          height: clamp(6vmin, 12vmin, 150px);
-          background: rgba(197, 160, 89, 0.15);
-          border: 1px solid rgba(197, 160, 89, 0.4);
-          border-radius: 4px;
+        .sidebar-logo {
+          font-size: clamp(0.85rem, 1.2vw, 1rem);
+          font-weight: 100;
+          letter-spacing: 0.3em;
+          color: #C5A059;
+          opacity: 0.9;
+          text-align: center;
+          margin-bottom: 0.5rem;
+          filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.3));
+        }
+        .new-chat-btn {
+          width: 100%;
+          padding: 0.9rem 1.2rem;
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.15) 0%, rgba(197, 160, 89, 0.08) 100%);
+          border: 1px solid rgba(197, 160, 89, 0.3);
+          border-radius: 12px;
           color: #C5A059;
           cursor: pointer;
           font-family: var(--font-cinzel), system-ui, sans-serif;
           font-weight: 100;
-          letter-spacing: 0.1em;
-          font-size: clamp(0.7rem, 2vmin, 0.9rem);
+          letter-spacing: 0.08em;
+          font-size: clamp(0.8rem, 1vw, 0.9rem);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.3s ease;
-          animation: slideInLeft 0.5s ease 0.1s backwards;
+          gap: 0.6rem;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          text-decoration: none;
         }
-        .sidebar-button:hover {
-          background: rgba(197, 160, 89, 0.3);
+        .new-chat-btn:hover {
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.25) 0%, rgba(197, 160, 89, 0.15) 100%);
           border-color: #C5A059;
-          transform: scale(1.05);
-          box-shadow: 0 0 20px rgba(197, 160, 89, 0.3);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(197, 160, 89, 0.2);
         }
-        .toggle-sidebar {
-          width: clamp(5vmin, 10vmin, 120px);
-          height: clamp(5vmin, 10vmin, 120px);
-          background: linear-gradient(135deg, rgba(197, 160, 89, 0.12), rgba(197, 160, 89, 0.05));
-          border: 1.5px solid rgba(197, 160, 89, 0.5);
+        .new-chat-btn:active {
+          transform: translateY(0);
+        }
+        .sidebar-content {
+          flex: 1;
+          overflow-y: auto;
+          padding: 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        .sidebar-content::-webkit-scrollbar {
+          width: 6px;
+        }
+        .sidebar-content::-webkit-scrollbar-track {
+          background: rgba(197, 160, 89, 0.05);
+          border-radius: 3px;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb {
+          background: rgba(197, 160, 89, 0.3);
+          border-radius: 3px;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+          background: rgba(197, 160, 89, 0.5);
+        }
+        .history-section {
+          margin-bottom: 1rem;
+        }
+        .history-title {
+          font-size: 0.75rem;
+          font-weight: 100;
+          letter-spacing: 0.1em;
+          color: rgba(197, 160, 89, 0.6);
+          margin-bottom: 0.5rem;
+          padding: 0 0.5rem;
+          text-transform: uppercase;
+        }
+        .history-item {
+          padding: 0.7rem 0.8rem;
+          background: rgba(197, 160, 89, 0.05);
+          border: 1px solid transparent;
+          border-radius: 8px;
+          color: rgba(197, 160, 89, 0.8);
+          cursor: pointer;
+          font-size: 0.85rem;
+          font-weight: 100;
+          letter-spacing: 0.03em;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .history-item:hover {
+          background: rgba(197, 160, 89, 0.12);
+          border-color: rgba(197, 160, 89, 0.3);
+          color: #C5A059;
+        }
+        .sidebar-footer {
+          padding: 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.8rem;
+          border-top: 1px solid rgba(197, 160, 89, 0.1);
+        }
+        .sidebar-button {
+          width: 100%;
+          padding: 0.8rem;
+          background: rgba(197, 160, 89, 0.08);
+          border: 1px solid rgba(197, 160, 89, 0.25);
           border-radius: 8px;
           color: #C5A059;
           cursor: pointer;
-          font-size: clamp(1.2rem, 3.5vmin, 2rem);
+          font-family: var(--font-cinzel), system-ui, sans-serif;
+          font-weight: 100;
+          letter-spacing: 0.08em;
+          font-size: clamp(0.75rem, 0.9vw, 0.85rem);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-          animation: slideInLeft 0.5s ease 0.2s backwards;
-          position: relative;
-          overflow: hidden;
+          gap: 0.5rem;
+          transition: all 0.3s ease;
+          text-decoration: none;
         }
-        .toggle-sidebar::before {
-          content: '';
-          position: absolute;
-          inset: -2px;
-          background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(197, 160, 89, 0.05));
+        .sidebar-button:hover {
+          background: rgba(197, 160, 89, 0.15);
+          border-color: rgba(197, 160, 89, 0.4);
+          transform: translateX(2px);
+        }
+        .toggle-sidebar {
+          width: 100%;
+          padding: 0.7rem;
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.1), rgba(197, 160, 89, 0.05));
+          border: 1px solid rgba(197, 160, 89, 0.3);
           border-radius: 8px;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          z-index: -1;
+          color: #C5A059;
+          cursor: pointer;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .toggle-sidebar:hover {
-          background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(197, 160, 89, 0.1));
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.18), rgba(197, 160, 89, 0.1));
           border-color: #C5A059;
-          transform: scale(1.1);
-          box-shadow: 0 8px 25px rgba(197, 160, 89, 0.35), inset 0 0 15px rgba(197, 160, 89, 0.1);
-        }
-        .toggle-sidebar:hover::before {
-          opacity: 1;
+          box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
         }
         .toggle-sidebar:active {
-          transform: scale(1.05);
+          transform: scale(0.98);
         }
         .chat-container {
           display: flex;
           flex-direction: column;
           flex: 1;
-          margin-left: clamp(8vmin, 15vmin, 200px);
+          margin-left: clamp(220px, 18vw, 280px);
           height: 100vh;
           background: #050505;
           color: #e5e5e5;
           font-family: var(--font-cinzel), system-ui, sans-serif;
-          transition: margin-left 0.3s ease;
+          transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .chat-container.sidebar-collapsed {
           margin-left: 0;
@@ -331,17 +406,48 @@ export default function Chat() {
       <div className="chat-wrapper">
         {/* Sidebar */}
         <div className={`sidebar ${!sidebarOpen ? "collapsed" : ""}`}>
-          <div className="sidebar-logo">DIVINACI</div>
-          <Link href="/" className="sidebar-button">
-            ◈ HOME
-          </Link>
-          <button
-            className="toggle-sidebar"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            title={sidebarOpen ? "Sceller le sanctuaire" : "Ouvrir le sanctuaire"}
-          >
-            {sidebarOpen ? "✦" : "✧"}
-          </button>
+          {/* Sidebar Header */}
+          <div className="sidebar-header">
+            <div className="sidebar-logo">DIVINACI</div>
+            <button 
+              className="new-chat-btn"
+              onClick={() => {
+                setMessages([]);
+                setInput("");
+              }}
+              title="Nouvelle conversation"
+            >
+              <span style={{ fontSize: '1.2rem' }}>✦</span>
+              <span>Nouveau Chat</span>
+            </button>
+          </div>
+
+          {/* Sidebar Content (History) */}
+          <div className="sidebar-content">
+            <div className="history-section">
+              <div className="history-title">Historique</div>
+              {messages.length > 0 && (
+                <div className="history-item">
+                  Session actuelle
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar Footer */}
+          <div className="sidebar-footer">
+            <Link href="/" className="sidebar-button">
+              <span>◈</span>
+              <span>Accueil</span>
+            </Link>
+            <button
+              className="toggle-sidebar"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              title={sidebarOpen ? "Sceller le sanctuaire" : "Ouvrir le sanctuaire"}
+            >
+              {sidebarOpen ? "✧" : "✦"}
+            </button>
+          </div>
         </div>
 
         {/* Main Chat Container */}
