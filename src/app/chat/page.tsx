@@ -143,26 +143,43 @@ export default function Chat() {
           box-shadow: 0 0 20px rgba(197, 160, 89, 0.3);
         }
         .toggle-sidebar {
-          position: fixed;
-          left: clamp(8vmin, 15vmin, 200px);
-          top: 1.5rem;
-          width: 2.5rem;
-          height: 2.5rem;
-          background: rgba(197, 160, 89, 0.15);
-          border: 1px solid rgba(197, 160, 89, 0.4);
-          border-radius: 4px;
+          width: clamp(5vmin, 10vmin, 120px);
+          height: clamp(5vmin, 10vmin, 120px);
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.12), rgba(197, 160, 89, 0.05));
+          border: 1.5px solid rgba(197, 160, 89, 0.5);
+          border-radius: 8px;
           color: #C5A059;
           cursor: pointer;
-          font-size: 1.2rem;
+          font-size: clamp(1.2rem, 3.5vmin, 2rem);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.3s ease;
-          z-index: 105;
+          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          animation: slideInLeft 0.5s ease 0.2s backwards;
+          position: relative;
+          overflow: hidden;
+        }
+        .toggle-sidebar::before {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(197, 160, 89, 0.05));
+          border-radius: 8px;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: -1;
         }
         .toggle-sidebar:hover {
-          background: rgba(197, 160, 89, 0.3);
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(197, 160, 89, 0.1));
           border-color: #C5A059;
+          transform: scale(1.1);
+          box-shadow: 0 8px 25px rgba(197, 160, 89, 0.35), inset 0 0 15px rgba(197, 160, 89, 0.1);
+        }
+        .toggle-sidebar:hover::before {
+          opacity: 1;
+        }
+        .toggle-sidebar:active {
+          transform: scale(1.05);
         }
         .chat-container {
           display: flex;
@@ -318,16 +335,14 @@ export default function Chat() {
           <Link href="/" className="sidebar-button">
             ◈ HOME
           </Link>
+          <button
+            className="toggle-sidebar"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            title={sidebarOpen ? "Sceller le sanctuaire" : "Ouvrir le sanctuaire"}
+          >
+            {sidebarOpen ? "✦" : "✧"}
+          </button>
         </div>
-
-        {/* Toggle Button */}
-        <button
-          className="toggle-sidebar"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-        >
-          {sidebarOpen ? "◄" : "►"}
-        </button>
 
         {/* Main Chat Container */}
         <div className={`chat-container ${!sidebarOpen ? "sidebar-collapsed" : ""}`}>
