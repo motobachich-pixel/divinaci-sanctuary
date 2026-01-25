@@ -170,7 +170,7 @@ export default function Home() {
     <div className={`${montserrat.className} w-screen h-dvh bg-[#050505] text-gray-300 flex flex-col overflow-hidden`}>
       <main className={`${borderPadClass} max-w-4xl mx-auto w-full h-full flex flex-col`}>
         {/* Header / Logo - Cinzel only */}
-        <div className="flex flex-col items-center justify-center pt-2 sm:pt-3 md:pt-4 pb-3 sm:pb-4 md:pb-5 border-b border-amber-500/30 flex-shrink-0 gap-1 sm:gap-2">
+        <div className="flex flex-col items-center justify-center pt-2 sm:pt-3 md:pt-4 pb-3 sm:pb-4 md:pb-5 border-b border-[#C5A059]/30 flex-shrink-0 gap-1 sm:gap-2">
           <h1
             className={`${cinzel.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wider text-[#C5A059] motion-safe:animate-pulse`}
             style={{ animationDuration: "4s" }}
@@ -210,7 +210,7 @@ export default function Home() {
         </div>
 
         {/* Input area - fixed at bottom */}
-        <div className="border-t-2 border-amber-500 bg-[#050505] pt-2 sm:pt-3 pb-2 sm:pb-3 flex-shrink-0">
+        <div className="border-t-2 border-[#C5A059] bg-[#050505] pt-2 sm:pt-3 pb-2 sm:pb-3 flex-shrink-0">
           <input
             type="text"
             aria-label="Intent"
@@ -219,7 +219,7 @@ export default function Home() {
             onChange={(e) => setIntent(e.target.value)}
             onKeyDown={onKeyDown}
             disabled={loading}
-            className={`w-full bg-black text-gray-300 placeholder-gray-500 py-2 sm:py-3 px-3 sm:px-4 rounded-lg border-2 border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 font-light text-sm sm:text-base
+            className={`w-full bg-black text-gray-300 placeholder-gray-500 py-2 sm:py-3 px-3 sm:px-4 rounded-lg border-2 border-[#C5A059] focus:outline-none focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] font-light text-sm sm:text-base
               ${loading ? "opacity-60" : "opacity-90"}
               transition-all duration-300
             `}
