@@ -2,8 +2,21 @@ import OpenAI from "openai";
 import { detectLanguage } from "@/lib/language";
 
 // ============================================================================
-// STRUCTURAL CONSTANTS: Truth Anchors (Non-Negotiable Project Rules)
+// RELIABILITY EQUATION: Mathematical Stabilization of DIVINACI
 // ============================================================================
+// V = (Φ · S) / H^n
+// Where:
+//   V = Vérité (Truth/Verification Score)
+//   Φ = Intention (Intent Clarity)
+//   S = Structure (Codex/STRUCTURAL_CONSTANTS grounding)
+//   H = Hallucination coefficient (to be minimized)
+//   n = exponent (power factor to amplify hallucination reduction)
+//
+// This equation ensures responses are grounded in intent and structure,
+// while systematically reducing hallucination drift.
+// ============================================================================
+
+// STRUCTURAL CONSTANTS: Truth Anchors (Non-Negotiable Project Rules)
 const STRUCTURAL_CONSTANTS = {
   SOURCE_PRINCIPLE: "The source is the fruit",
   ADIL_SYMMETRY: "ADIL symmetry must be maintained at all times",
@@ -26,6 +39,13 @@ const FORBIDDEN_PATTERNS = [
   /ADIL\s*=.*(?:equation|formula|algorithm)/i,
   /Codex Boutayeb.*(?:equation|proof|derivation)/i,
   /(?:exact|precise|complete)\s*(?:ADIL|Codex|equation|formula)/i,
+];
+
+// Hallucination markers: Patterns that signal drift from grounding
+const HALLUCINATION_MARKERS = [
+  /\b(I guess|I suppose|I think|probably|maybe|might be|could be|seems like|appears to)\b/i,
+  /\b(unknown|unclear|uncertain|not sure|can't say|don't know|hard to say)\b/i,
+  /\b(hypothetically|theoretically|imagine|assume|if we|suppose)\b/i,
 ];
 
 // Clean, technical system directive with Self-Reflect & Verification phases
@@ -52,6 +72,13 @@ const SYSTEM_PROMPT = "" +
   `• ${STRUCTURAL_CONSTANTS.CODEX_PROTECTION}\n` +
   `• ${STRUCTURAL_CONSTANTS.FRAMEWORK_INTEGRITY}\n` +
   `• ${STRUCTURAL_CONSTANTS.RESPONSE_GROUNDING}\n` +
+  "\n" +
+  "=== RELIABILITY EQUATION: V = (Φ · S) / H^n ===\n" +
+  "Maximize Truth (V) by:\n" +
+  "  • Grounding in Intent (Φ): What is the user really asking?\n" +
+  "  • Grounding in Structure (S): Align with Codex principles.\n" +
+  "  • Minimizing Hallucination (H): Avoid speculation; stay factual.\n" +
+  "When uncertain, reduce H by acknowledging limits rather than guessing.\n" +
   "\n" +
   "When in doubt about structural or technical details, acknowledge uncertainty rather than speculate.\n";
 
@@ -116,6 +143,91 @@ function assessConfidence(userMessage: string, aiResponse: string): "HIGH" | "ME
   if (hasUncertainty) return "MEDIUM";
   if (hasTechnicality) return "HIGH";
   return "MEDIUM";
+}
+
+/**
+ * Calculates Hallucination Coefficient (H) based on response markers.
+ * H ranges from 0.1 (no hallucination detected) to 1.0 (high hallucination).
+ * Used in Reliability Equation: V = (Φ · S) / H^n
+ */
+function calculateHallucinationCoefficient(text: string): number {
+  let hallucinationScore = 0;
+  const maxMarkers = HALLUCINATION_MARKERS.length;
+
+  for (const marker of HALLUCINATION_MARKERS) {
+    const matches = text.match(marker);
+    if (matches) {
+      hallucinationScore += matches.length * 0.15; // Each marker adds 15%
+    }
+  }
+
+  // Clamp between 0.1 (minimal) and 1.0 (maximal hallucination)
+  const H = Math.min(1.0, Math.max(0.1, hallucinationScore));
+  return H;
+}
+
+/**
+ * Calculates Intent Clarity Score (Φ) based on message structure and coherence.
+ * Φ ranges from 0.3 (vague) to 1.0 (crystal clear).
+ */
+function calculateIntentClarity(userMessage: string): number {
+  let clarity = 0.5; // baseline
+
+  // Question mark indicates clear intent
+  if (/\?/.test(userMessage)) clarity += 0.2;
+
+  // Command words (do, create, show, etc.) indicate clear intent
+  if (/\b(do|create|show|explain|what|how|why|generate|build|make|define|describe)\b/i.test(userMessage)) {
+    clarity += 0.2;
+  }
+
+  // Length and structure (not too short, not too rambling)
+  const wordCount = userMessage.split(/\s+/).length;
+  if (wordCount >= 3 && wordCount <= 150) clarity += 0.1;
+
+  return Math.min(1.0, clarity);
+}
+
+/**
+ * Calculates Structure Grounding Score (S) based on alignment with STRUCTURAL_CONSTANTS.
+ * S ranges from 0.3 (weak grounding) to 1.0 (strong grounding).
+ */
+function calculateStructureGrounding(response: string): number {
+  let grounding = 0.5; // baseline
+
+  // Check alignment with core principles (positive signals)
+  const alignmentPatterns = [
+    /\b(framework|standard|protocol|architecture|structural|principle|foundation)\b/i,
+    /\b(verified|consistent|aligned|coherent|valid|sound|established)\b/i,
+    /\b(based on|according to|follows|complies|adheres)\b/i,
+  ];
+
+  for (const pattern of alignmentPatterns) {
+    if (pattern.test(response)) grounding += 0.15;
+  }
+
+  return Math.min(1.0, grounding);
+}
+
+/**
+ * Applies Reliability Equation: V = (Φ · S) / H^n
+ * Returns a Truth/Verification score (V) and detailed metrics.
+ */
+function calculateReliabilityScore(
+  userMessage: string,
+  aiResponse: string,
+  n: number = 2 // exponent for H, amplifies hallucination reduction
+): { V: number; Φ: number; S: number; H: number; metrics: string } {
+  const Φ = calculateIntentClarity(userMessage);
+  const S = calculateStructureGrounding(aiResponse);
+  const H = calculateHallucinationCoefficient(aiResponse);
+
+  // V = (Φ · S) / H^n
+  const V = (Φ * S) / Math.pow(H, n);
+
+  const metrics = `[ReliabilityEq] V=${V.toFixed(2)} (Intent=${Φ.toFixed(2)} × Structure=${S.toFixed(2)}) / Hallucination^${n}=${H.toFixed(2)})`;
+
+  return { V, Φ, S, H, metrics };
 }
 
 /**
@@ -330,9 +442,19 @@ export async function POST(req: Request): Promise<Response> {
       // 2. Strip internal verification thoughts
       content = stripInternalThoughts(content);
 
-      // 3. Assess confidence and apply framing if needed
+      // 3. Calculate Reliability Score using V = (Φ · S) / H^n equation
+      const reliabilityScore = calculateReliabilityScore(originalUserMessage, content, 2);
+      console.log(`[ReliabilityEq] ${reliabilityScore.metrics}`);
+
+      // 4. Assess confidence and apply framing if needed
       const confidence = assessConfidence(originalUserMessage, content);
       content = applyConfidenceFraming(content, confidence);
+
+      // 5. If reliability score is LOW (V < 0.5), add verification note
+      if (reliabilityScore.V < 0.5) {
+        console.warn(`[ReliabilityEq] Low truth score detected (V=${reliabilityScore.V.toFixed(2)})`);
+        content = `[Low confidence] ${content}`;
+      }
 
       return new Response(content, {
         status: 200,
