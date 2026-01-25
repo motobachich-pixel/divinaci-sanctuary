@@ -96,11 +96,11 @@ export default function Home() {
         className={`mx-auto ${borderPadClass} max-w-3xl min-h-dvh flex flex-col`}
       >
         {/* Frame with golden border */}
-        <div className="flex-1 border border-[#D4AF37] flex flex-col">
+        <div className="flex-1 border border-[#C5A059] flex flex-col">
           {/* Header / Logo */}
           <div className="flex items-center justify-center pt-16">
             <h1
-              className={`${cinzel.className} text-4xl sm:text-5xl tracking-[0.25em] text-[#D4AF37] motion-safe:animate-pulse`}
+              className={`${cinzel.className} text-4xl sm:text-5xl tracking-[0.25em] text-[#C5A059] motion-safe:animate-pulse`}
               style={{ animationDuration: "4s" }}
             >
               DIVINACI
@@ -117,7 +117,7 @@ export default function Home() {
                 <div
                   key={m.id}
                   className={`
-                    ${m.role === "user" ? "text-zinc-300" : "text-[#D4AF37]"}
+                    ${m.role === "user" ? "text-zinc-300" : "text-[#C5A059]"}
                     transition-opacity duration-700 ease-out opacity-100
                   `}
                 >
@@ -138,7 +138,7 @@ export default function Home() {
               onKeyDown={onKeyDown}
               className="w-full bg-transparent text-zinc-200 placeholder-zinc-500 focus:outline-none text-base"
             />
-            <div className="mt-2 h-px bg-[#D4AF37]/60" />
+            <div className="mt-2 h-px bg-[#C5A059]/60" />
             <div className="mt-3 text-xs text-zinc-500">
               {loading ? "Listening…" : "Press Enter to send"}
             </div>
