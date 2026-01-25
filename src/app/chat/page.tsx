@@ -19,6 +19,7 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -78,14 +79,104 @@ export default function Chat() {
           width: 100%;
           height: 100%;
         }
+        .chat-wrapper {
+          display: flex;
+          width: 100%;
+          height: 100vh;
+          background: #050505;
+        }
+        .sidebar {
+          position: fixed;
+          left: 0;
+          top: 0;
+          height: 100vh;
+          width: clamp(8vmin, 15vmin, 200px);
+          background: rgba(5, 5, 5, 0.95);
+          backdrop-filter: blur(10px);
+          border-right: 1px solid rgba(197, 160, 89, 0.2);
+          z-index: 100;
+          transition: transform 0.3s ease;
+          transform: translateX(0);
+          padding-top: 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2rem;
+        }
+        .sidebar.collapsed {
+          transform: translateX(-100%);
+        }
+        .sidebar-logo {
+          writing-mode: vertical-rl;
+          text-orientation: mixed;
+          font-size: clamp(0.7rem, 2vmin, 1rem);
+          font-weight: 100;
+          letter-spacing: 0.15em;
+          color: #C5A059;
+          opacity: 0.7;
+          transform: rotate(180deg);
+          white-space: nowrap;
+          animation: slideInLeft 0.5s ease;
+        }
+        .sidebar-button {
+          width: clamp(6vmin, 12vmin, 150px);
+          height: clamp(6vmin, 12vmin, 150px);
+          background: rgba(197, 160, 89, 0.15);
+          border: 1px solid rgba(197, 160, 89, 0.4);
+          border-radius: 4px;
+          color: #C5A059;
+          cursor: pointer;
+          font-family: var(--font-cinzel), system-ui, sans-serif;
+          font-weight: 100;
+          letter-spacing: 0.1em;
+          font-size: clamp(0.7rem, 2vmin, 0.9rem);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          animation: slideInLeft 0.5s ease 0.1s backwards;
+        }
+        .sidebar-button:hover {
+          background: rgba(197, 160, 89, 0.3);
+          border-color: #C5A059;
+          transform: scale(1.05);
+          box-shadow: 0 0 20px rgba(197, 160, 89, 0.3);
+        }
+        .toggle-sidebar {
+          position: fixed;
+          left: clamp(8vmin, 15vmin, 200px);
+          top: 1.5rem;
+          width: 2.5rem;
+          height: 2.5rem;
+          background: rgba(197, 160, 89, 0.15);
+          border: 1px solid rgba(197, 160, 89, 0.4);
+          border-radius: 4px;
+          color: #C5A059;
+          cursor: pointer;
+          font-size: 1.2rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          z-index: 105;
+        }
+        .toggle-sidebar:hover {
+          background: rgba(197, 160, 89, 0.3);
+          border-color: #C5A059;
+        }
         .chat-container {
           display: flex;
           flex-direction: column;
-          width: 100%;
+          flex: 1;
+          margin-left: clamp(8vmin, 15vmin, 200px);
           height: 100vh;
           background: #050505;
           color: #e5e5e5;
           font-family: var(--font-cinzel), system-ui, sans-serif;
+          transition: margin-left 0.3s ease;
+        }
+        .chat-container.sidebar-collapsed {
+          margin-left: 0;
         }
         .chat-header {
           padding: clamp(1rem, 3vmin, 2rem);
@@ -100,6 +191,16 @@ export default function Chat() {
           font-weight: 100;
           letter-spacing: 0.1em;
           color: #C5A059;
+        }
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
         .back-link {
           color: #C5A059;
@@ -210,10 +311,29 @@ export default function Chat() {
         }
       `}</style>
 
-      <div className="chat-container">
+      <div className="chat-wrapper">
+        {/* Sidebar */}
+        <div className={`sidebar ${!sidebarOpen ? "collapsed" : ""}`}>
+          <div className="sidebar-logo">DIVINACI</div>
+          <Link href="/" className="sidebar-button">
+            ◈ HOME
+          </Link>
+        </div>
+
+        {/* Toggle Button */}
+        <button
+          className="toggle-sidebar"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+        >
+          {sidebarOpen ? "◄" : "►"}
+        </button>
+
+        {/* Main Chat Container */}
+        <div className={`chat-container ${!sidebarOpen ? "sidebar-collapsed" : ""}`}>
         {/* Chat Header */}
         <div className="chat-header">
-          <h1>DIVINACI Sanctum</h1>
+          <h1>DIVINACI</h1>
           <Link href="/" className="back-link">
             ← Return
           </Link>
@@ -250,6 +370,7 @@ export default function Chat() {
               {loading ? "..." : "Transmit"}
             </button>
           </form>
+        </div>
         </div>
       </div>
     </div>
