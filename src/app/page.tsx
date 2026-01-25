@@ -116,6 +116,10 @@ export default function Home() {
           0% { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
+        @keyframes slideInLeft {
+          from { transform: translateX(-100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
         * {
           margin: 0;
           padding: 0;
@@ -124,6 +128,65 @@ export default function Home() {
         body, html {
           width: 100%;
           height: 100%;
+        }
+        .sidebar {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: clamp(60px, 12vmin, 120px);
+          height: 100%;
+          background: rgba(5, 5, 5, 0.95);
+          border-right: 1px solid rgba(197, 160, 89, 0.2);
+          z-index: 10;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: clamp(1rem, 3vmin, 2rem) 0;
+          gap: clamp(1.5rem, 4vmin, 2.5rem);
+          animation: slideInLeft 0.4s ease;
+          backdrop-filter: blur(10px);
+        }
+        .sidebar-logo {
+          font-family: var(--font-cinzel);
+          font-size: clamp(0.7rem, 2vmin, 1.2rem);
+          font-weight: 100;
+          letter-spacing: 0.1em;
+          color: #C5A059;
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+          text-align: center;
+          opacity: 0.7;
+        }
+        .sidebar-button {
+          width: clamp(50px, 8vmin, 90px);
+          height: clamp(50px, 8vmin, 90px);
+          border-radius: 4px;
+          border: 1px solid rgba(197, 160, 89, 0.4);
+          background: rgba(197, 160, 89, 0.05);
+          color: #C5A059;
+          font-family: var(--font-cinzel);
+          font-size: clamp(0.65rem, 1.8vmin, 0.85rem);
+          font-weight: 100;
+          letter-spacing: 0.08em;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: clamp(0.5rem, 1vmin, 1rem);
+          transition: all 0.3s ease;
+          text-decoration: none;
+          line-height: 1.2;
+        }
+        .sidebar-button:hover {
+          background: rgba(197, 160, 89, 0.15);
+          border-color: #C5A059;
+          transform: scale(1.05);
+          box-shadow: 0 0 clamp(8px, 2vmin, 15px) rgba(197, 160, 89, 0.2);
+        }
+        .sidebar-button.chat-btn {
+          background: rgba(197, 160, 89, 0.1);
+          border-color: #C5A059;
         }
         .void {
           position: fixed;
@@ -212,6 +275,14 @@ export default function Home() {
           50% { opacity: 1; }
         }
       `}</style>
+
+      {/* Left Sidebar Menu */}
+      <div className="sidebar">
+        <div className="sidebar-logo">DIVINACI</div>
+        <a href="/chat" className="sidebar-button chat-btn" title="Enter DIVINACI Chat">
+          ◈ CHAT
+        </a>
+      </div>
 
       {/* Zen Void Background — Clickable to enter chat */}
       <a href="/chat" className="void-link" title="Enter the sanctum"></a>
