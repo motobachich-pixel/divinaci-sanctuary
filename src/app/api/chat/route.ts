@@ -101,8 +101,8 @@ export async function POST(req: Request): Promise<Response> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return new Response(
-      JSON.stringify({ error: "Missing OPENAI_API_KEY environment variable" }),
-      { status: 500, headers: { "content-type": "application/json" } }
+      "Missing OPENAI_API_KEY environment variable",
+      { status: 500, headers: { "content-type": "text/plain; charset=utf-8" } }
     );
   }
 
@@ -168,8 +168,8 @@ export async function POST(req: Request): Promise<Response> {
       });
     } catch (finalErr) {
       return new Response(
-        JSON.stringify({ error: "Failed to generate response" }),
-        { status: 500, headers: { "content-type": "application/json" } }
+        "An error occurred while processing your request.",
+        { status: 500, headers: { "content-type": "text/plain; charset=utf-8" } }
       );
     }
   }
