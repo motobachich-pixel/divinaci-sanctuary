@@ -1,10 +1,10 @@
 "use client";
 
-import { Cinzel, Inter } from "next/font/google";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Cinzel, Montserrat } from "next/font/google";
+import { useEffect, useRef, useState } from "react";
 
 const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "700"] });
-const inter = Inter({ subsets: ["latin"] });
+const montserrat = Montserrat({ subsets: ["latin"], weight: ["400", "500", "600"] });
 
 type ChatMsg = { id: string; role: "user" | "assistant"; content: string };
 
@@ -91,44 +91,46 @@ export default function Home() {
   const borderPadClass = "p-[5px] sm:p-[10px]"; // golden borders padding requirement
 
   return (
-    <div className={`${inter.className} min-h-dvh bg-[#050505] text-zinc-200`}>
+    <div className={`${montserrat.className} min-h-dvh bg-[#050505] text-gray-300`}>
       <main
-        className={`mx-auto ${borderPadClass} max-w-3xl min-h-dvh flex flex-col`}
+        className={`mx-auto ${borderPadClass} max-w-2xl min-h-dvh flex flex-col justify-center`}
       >
-        {/* Frame with golden border */}
-        <div className="flex-1 border border-[#C5A059] flex flex-col">
-          {/* Header / Logo */}
-          <div className="flex items-center justify-center pt-16">
+        {/* Minimal frame - no border, clean structure */}
+        <div className="flex-1 flex flex-col">
+          {/* Header / Logo - Cinzel only */}
+          <div className="flex items-center justify-center pb-16">
             <h1
-              className={`${cinzel.className} text-4xl sm:text-5xl tracking-[0.25em] text-[#C5A059] motion-safe:animate-pulse`}
+              className={`${cinzel.className} text-5xl sm:text-6xl tracking-wider text-[#C5A059] motion-safe:animate-pulse`}
               style={{ animationDuration: "4s" }}
             >
               DIVINACI
             </h1>
           </div>
 
-          {/* Messages area */}
+          {/* Messages area - clean, minimal */}
           <div
             ref={listRef}
-            className="mt-12 flex-1 overflow-y-auto px-6 sm:px-10"
+            className="flex-1 overflow-y-auto px-0 sm:px-0 mb-12"
           >
-            <div className="space-y-6">
+            <div className="space-y-8">
               {messages.map((m) => (
                 <div
                   key={m.id}
                   className={`
-                    ${m.role === "user" ? "text-zinc-300" : "text-[#C5A059]"}
-                    transition-opacity duration-700 ease-out opacity-100
+                    transition-opacity duration-700 ease-out
+                    ${m.role === "user" ? "text-gray-400" : "text-[#C5A059]"}
                   `}
                 >
-                  <p className={`${m.role === "user" ? "" : cinzel.className} text-lg leading-relaxed`}>{m.content}</p>
+                  <p className={`${m.role === "user" ? `${montserrat.className}` : cinzel.className} text-base sm:text-lg leading-relaxed font-medium`}>
+                    {m.content}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Input line at bottom */}
-          <div className="px-6 sm:px-10 pb-10">
+          {/* Input area - minimal, symmetric */}
+          <div className="border-t border-gray-700/50">
             <input
               type="text"
               aria-label="Intent"
@@ -136,12 +138,17 @@ export default function Home() {
               value={intent}
               onChange={(e) => setIntent(e.target.value)}
               onKeyDown={onKeyDown}
-              className="w-full bg-transparent text-zinc-200 placeholder-zinc-500 focus:outline-none text-base"
+              disabled={loading}
+              className={`w-full bg-transparent py-4 text-gray-200 placeholder-gray-600 focus:outline-none text-base font-light
+                ${loading ? "opacity-50" : "opacity-100"}
+                transition-opacity duration-300
+              `}
             />
-            <div className="mt-2 h-px bg-[#C5A059]/60" />
-            <div className="mt-3 text-xs text-zinc-500">
-              {loading ? "Listening…" : "Press Enter to send"}
-            </div>
+          </div>
+
+          {/* Status - minimal */}
+          <div className="pt-3 text-xs tracking-wide text-gray-500 uppercase">
+            {loading ? "Processing…" : "Ready"}
           </div>
         </div>
       </main>
