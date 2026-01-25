@@ -2,11 +2,17 @@
 
 import { Cinzel, Montserrat } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
+import { RichContent } from "@/components/RichContent";
 
 const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "700"] });
 const montserrat = Montserrat({ subsets: ["latin"], weight: ["400", "500", "600"] });
 
-type ChatMsg = { id: string; role: "user" | "assistant"; content: string };
+type ChatMsg = { 
+  id: string; 
+  role: "user" | "assistant"; 
+  content: string;
+  richContent?: any;
+};
 
 export default function Home() {
   const [intent, setIntent] = useState("");
@@ -69,10 +75,11 @@ export default function Home() {
           addMessage({ id: crypto.randomUUID(), role: "assistant", content: text });
         }
       } else {
-        // JSON fallback
+        // JSON fallback with rich content support
         const data = await res.json().catch(() => ({ message: "" }));
         const content = data?.message ?? "";
-        addMessage({ id: crypto.randomUUID(), role: "assistant", content });
+        const richContent = data?.richContent;
+        addMessage({ id: crypto.randomUUID(), role: "assistant", content, richContent });
       }
     } catch (e) {
       addMessage({ id: crypto.randomUUID(), role: "assistant", content: "…" });
@@ -124,6 +131,11 @@ export default function Home() {
                   <p className={`${m.role === "user" ? `${montserrat.className}` : cinzel.className} text-sm sm:text-base md:text-lg leading-relaxed font-medium break-words`}>
                     {m.content}
                   </p>
+                  {m.richContent && m.role === "assistant" && (
+                    <div className="mt-3 bg-gray-800/30 p-3 rounded-lg border border-[#C5A059]/20">
+                      <RichContent content={m.richContent} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
