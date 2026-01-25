@@ -1,6 +1,7 @@
 "use client";
 
 import { Cinzel } from "next/font/google";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const cinzel = Cinzel({
@@ -20,6 +21,11 @@ export default function Home() {
     setIdle(false);
     if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
     idleTimeoutRef.current = setTimeout(() => setIdle(true), 5000);
+  };
+
+  // Handle click navigation to chat
+  const handleClick = () => {
+    window.location.href = "/chat";
   };
 
   // Particle animation loop with DPR scaling and responsive canvas
@@ -150,6 +156,20 @@ export default function Home() {
           z-index: 2;
           cursor: pointer;
           box-shadow: 0 0 clamp(30px, 6vmin, 80px) rgba(197, 160, 89, 0.28);
+          transition: filter 0.3s ease;
+        }
+        .star:hover {
+          filter: brightness(1.2);
+        }
+        .void-link {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+          cursor: pointer;
+          text-decoration: none;
         }
         .title-container {
           position: fixed;
@@ -193,17 +213,22 @@ export default function Home() {
         }
       `}</style>
 
-      {/* Zen Void Background */}
+      {/* Zen Void Background — Clickable to enter chat */}
+      <a href="/chat" className="void-link" title="Enter the sanctum"></a>
       <div className="void"></div>
 
       {/* Particle Canvas */}
       <canvas ref={canvasRef} className="canvas" />
 
-      {/* Pulsing Star */}
+      {/* Pulsing Star — Clickable to enter chat */}
       <div
         className="star"
+        onClick={handleClick}
         onMouseEnter={handleStarHover}
         onMouseMove={handleStarHover}
+        role="button"
+        tabIndex={0}
+        title="Click to enter the sanctum"
       ></div>
 
       {/* Title: USULDIVINACI */}
