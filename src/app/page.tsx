@@ -1,63 +1,148 @@
-import Image from "next/image";
+"use client";
+
+import { Cinzel, Inter } from "next/font/google";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "700"] });
+const inter = Inter({ subsets: ["latin"] });
+
+type ChatMsg = { id: string; role: "user" | "assistant"; content: string };
 
 export default function Home() {
+  const [intent, setIntent] = useState("");
+  const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [loading, setLoading] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const addMessage = (msg: ChatMsg) => {
+    setMessages((prev) => [...prev, msg]);
+  };
+
+  const sendIntent = async () => {
+    const trimmed = intent.trim();
+    if (!trimmed || loading) return;
+    setLoading(true);
+
+    const userMsg: ChatMsg = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: trimmed,
+    };
+    addMessage(userMsg);
+    setIntent("");
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: trimmed }),
+      });
+
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("text/plain")) {
+        // Streaming text response
+        const reader = res.body?.getReader();
+        const decoder = new TextDecoder();
+        let aggregated = "";
+        if (reader) {
+          // create an assistant placeholder and update progressively
+          const id = crypto.randomUUID();
+          addMessage({ id, role: "assistant", content: "" });
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            aggregated += chunk;
+            setMessages((prev) =>
+              prev.map((m) => (m.id === id ? { ...m, content: aggregated } : m))
+            );
+          }
+        } else {
+          // No stream visibility, fallback to single message
+          const text = await res.text();
+          addMessage({ id: crypto.randomUUID(), role: "assistant", content: text });
+        }
+      } else {
+        // JSON fallback
+        const data = await res.json().catch(() => ({ message: "" }));
+        const content = data?.message ?? "";
+        addMessage({ id: crypto.randomUUID(), role: "assistant", content });
+      }
+    } catch (e) {
+      addMessage({ id: crypto.randomUUID(), role: "assistant", content: "…" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendIntent();
+    }
+  };
+
+  const borderPadClass = "p-[5px] sm:p-[10px]"; // golden borders padding requirement
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className={`${inter.className} min-h-dvh bg-[#050505] text-zinc-200`}>
+      <main
+        className={`mx-auto ${borderPadClass} max-w-3xl min-h-dvh flex flex-col`}
+      >
+        {/* Frame with golden border */}
+        <div className="flex-1 border border-[#D4AF37] flex flex-col">
+          {/* Header / Logo */}
+          <div className="flex items-center justify-center pt-16">
+            <h1
+              className={`${cinzel.className} text-4xl sm:text-5xl tracking-[0.25em] text-[#D4AF37] motion-safe:animate-pulse`}
+              style={{ animationDuration: "4s" }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+              DIVINACI
+            </h1>
+          </div>
+
+          {/* Messages area */}
+          <div
+            ref={listRef}
+            className="mt-12 flex-1 overflow-y-auto px-6 sm:px-10"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            <div className="space-y-6">
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`
+                    ${m.role === "user" ? "text-zinc-300" : "text-[#D4AF37]"}
+                    transition-opacity duration-700 ease-out opacity-100
+                  `}
+                >
+                  <p className={`${m.role === "user" ? "" : cinzel.className} text-lg leading-relaxed`}>{m.content}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Input line at bottom */}
+          <div className="px-6 sm:px-10 pb-10">
+            <input
+              type="text"
+              aria-label="Intent"
+              placeholder="Intent…"
+              value={intent}
+              onChange={(e) => setIntent(e.target.value)}
+              onKeyDown={onKeyDown}
+              className="w-full bg-transparent text-zinc-200 placeholder-zinc-500 focus:outline-none text-base"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div className="mt-2 h-px bg-[#D4AF37]/60" />
+            <div className="mt-3 text-xs text-zinc-500">
+              {loading ? "Listening…" : "Press Enter to send"}
+            </div>
+          </div>
         </div>
       </main>
     </div>
