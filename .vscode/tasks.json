@@ -1,0 +1,106 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Verify Local Server",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "check:server"],
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Next.js app",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"npm run build"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Next.js app (retry)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"npm run build"
+			],
+			"group": "build"
+		},
+		{
+			"label": "TypeScript typecheck",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"npx tsc --noEmit"
+			],
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Lint + Build",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"npm run lint; npm run build"
+			],
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build (finalize)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"npm run build"
+			],
+			"group": "build"
+		},
+		{
+			"label": "API smoke test",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"$body = @{ messages = @(@{ role='user'; content='Bonjour! Peux-tu générer une image d\\'un dragon bleu?'}) } | ConvertTo-Json -Depth 5; Invoke-WebRequest -Uri 'http://localhost:3000/api/chat' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 30 | Select-Object -ExpandProperty Content | Out-String | Set-Content -Path .\\api_test_output.txt; Get-Content .\\api_test_output.txt -TotalCount 20"
+			]
+		},
+		{
+			"label": "API smoke test (retry)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"$body = @{ messages = @(@{ role=\"user\"; content=\"Bonjour, peux-tu répondre en français?\"}) } | ConvertTo-Json -Depth 5; Invoke-WebRequest -Uri 'http://localhost:3000/api/chat' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 20 | Select-Object -ExpandProperty Content | Out-String | Set-Content -Path .\\api_test_output.txt; Get-Content .\\api_test_output.txt -TotalCount 20"
+			]
+		}
+	]
+}
