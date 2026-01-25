@@ -120,6 +120,18 @@ export default function Home() {
           from { transform: translateX(-100%); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
         }
+        @keyframes sidebarGlow {
+          0%, 100% { box-shadow: inset 0 0 20px rgba(197, 160, 89, 0.05); }
+          50% { box-shadow: inset 0 0 30px rgba(197, 160, 89, 0.15); }
+        }
+        @keyframes buttonPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.4); }
+          50% { box-shadow: 0 0 20px 4px rgba(197, 160, 89, 0.2); }
+        }
+        @keyframes logoGlow {
+          0%, 100% { text-shadow: 0 0 10px rgba(197, 160, 89, 0.3); }
+          50% { text-shadow: 0 0 20px rgba(197, 160, 89, 0.6); }
+        }
         * {
           margin: 0;
           padding: 0;
@@ -133,60 +145,83 @@ export default function Home() {
           position: fixed;
           left: 0;
           top: 0;
-          width: clamp(60px, 12vmin, 120px);
+          width: clamp(70px, 14vmin, 140px);
           height: 100%;
-          background: rgba(5, 5, 5, 0.95);
-          border-right: 1px solid rgba(197, 160, 89, 0.2);
+          background: linear-gradient(135deg, rgba(5, 5, 5, 0.98) 0%, rgba(20, 15, 5, 0.95) 100%);
+          border-right: 2px solid rgba(197, 160, 89, 0.3);
           z-index: 10;
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: clamp(1rem, 3vmin, 2rem) 0;
-          gap: clamp(1.5rem, 4vmin, 2.5rem);
-          animation: slideInLeft 0.4s ease;
-          backdrop-filter: blur(10px);
+          padding: clamp(2rem, 5vmin, 3rem) 0;
+          gap: clamp(2.5rem, 6vmin, 4rem);
+          animation: slideInLeft 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), sidebarGlow 4s ease-in-out infinite;
+          backdrop-filter: blur(15px);
+          box-shadow: inset -1px 0 rgba(197, 160, 89, 0.1);
         }
         .sidebar-logo {
           font-family: var(--font-cinzel);
-          font-size: clamp(0.7rem, 2vmin, 1.2rem);
+          font-size: clamp(0.75rem, 2.2vmin, 1.3rem);
           font-weight: 100;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.15em;
           color: #C5A059;
           writing-mode: vertical-rl;
           transform: rotate(180deg);
           text-align: center;
-          opacity: 0.7;
+          opacity: 0.85;
+          animation: logoGlow 3s ease-in-out infinite;
+          filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.2));
         }
         .sidebar-button {
-          width: clamp(50px, 8vmin, 90px);
-          height: clamp(50px, 8vmin, 90px);
-          border-radius: 4px;
-          border: 1px solid rgba(197, 160, 89, 0.4);
-          background: rgba(197, 160, 89, 0.05);
+          width: clamp(55px, 9vmin, 100px);
+          height: clamp(55px, 9vmin, 100px);
+          border-radius: 8px;
+          border: 1.5px solid rgba(197, 160, 89, 0.5);
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.08) 0%, rgba(197, 160, 89, 0.03) 100%);
           color: #C5A059;
           font-family: var(--font-cinzel);
-          font-size: clamp(0.65rem, 1.8vmin, 0.85rem);
+          font-size: clamp(0.7rem, 2vmin, 0.95rem);
           font-weight: 100;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.1em;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-direction: column;
           text-align: center;
-          padding: clamp(0.5rem, 1vmin, 1rem);
-          transition: all 0.3s ease;
+          padding: clamp(0.6rem, 1.2vmin, 1.2rem);
+          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
           text-decoration: none;
-          line-height: 1.2;
+          line-height: 1.3;
+          position: relative;
+          overflow: hidden;
+        }
+        .sidebar-button::before {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(197, 160, 89, 0.05));
+          border-radius: 8px;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: -1;
         }
         .sidebar-button:hover {
-          background: rgba(197, 160, 89, 0.15);
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.15) 0%, rgba(197, 160, 89, 0.08) 100%);
           border-color: #C5A059;
-          transform: scale(1.05);
-          box-shadow: 0 0 clamp(8px, 2vmin, 15px) rgba(197, 160, 89, 0.2);
+          transform: scale(1.12) translateX(2px);
+          box-shadow: 0 8px 25px rgba(197, 160, 89, 0.35), inset 0 0 15px rgba(197, 160, 89, 0.1);
+        }
+        .sidebar-button:active {
+          transform: scale(1.08) translateX(2px);
         }
         .sidebar-button.chat-btn {
-          background: rgba(197, 160, 89, 0.1);
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.12) 0%, rgba(197, 160, 89, 0.05) 100%);
           border-color: #C5A059;
+          animation: buttonPulse 2s infinite;
+        }
+        .sidebar-button.chat-btn:hover {
+          animation: none;
         }
         .void {
           position: fixed;
@@ -213,16 +248,30 @@ export default function Home() {
           transform: translate(-50%, -50%);
           width: clamp(140px, 22vmin, 340px);
           height: clamp(140px, 22vmin, 340px);
-          background: radial-gradient(circle at center, #C5A059 0%, transparent 70%);
+          background: radial-gradient(circle at 35% 35%, #E8D5A3 0%, #C5A059 20%, #8B6F47 45%, transparent 70%);
           border-radius: 50%;
           animation: breathe 10s ease-in-out infinite;
           z-index: 2;
           cursor: pointer;
-          box-shadow: 0 0 clamp(30px, 6vmin, 80px) rgba(197, 160, 89, 0.28);
-          transition: filter 0.3s ease;
+          box-shadow: 
+            0 0 clamp(40px, 8vmin, 100px) rgba(197, 160, 89, 0.4),
+            0 0 clamp(70px, 14vmin, 180px) rgba(197, 160, 89, 0.25),
+            0 0 clamp(100px, 20vmin, 280px) rgba(197, 160, 89, 0.12),
+            inset -30px -30px 60px rgba(0, 0, 0, 0.3),
+            inset 20px 20px 40px rgba(255, 255, 255, 0.15);
+          transition: filter 0.3s ease, box-shadow 0.4s ease;
+          filter: drop-shadow(0 0 clamp(20px, 4vmin, 50px) rgba(197, 160, 89, 0.3));
         }
         .star:hover {
-          filter: brightness(1.2);
+          filter: 
+            brightness(1.25) 
+            drop-shadow(0 0 clamp(30px, 6vmin, 80px) rgba(197, 160, 89, 0.5));
+          box-shadow: 
+            0 0 clamp(50px, 10vmin, 120px) rgba(197, 160, 89, 0.5),
+            0 0 clamp(90px, 18vmin, 220px) rgba(197, 160, 89, 0.35),
+            0 0 clamp(130px, 26vmin, 360px) rgba(197, 160, 89, 0.2),
+            inset -30px -30px 60px rgba(0, 0, 0, 0.3),
+            inset 20px 20px 40px rgba(255, 255, 255, 0.2);
         }
         .void-link {
           position: fixed;
