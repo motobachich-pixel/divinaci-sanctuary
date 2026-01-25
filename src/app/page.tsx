@@ -18,6 +18,7 @@ export default function Home() {
   const [intent, setIntent] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState<string>("en");
   const listRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -79,6 +80,8 @@ export default function Home() {
         const data = await res.json().catch(() => ({ message: "" }));
         const content = data?.message ?? "";
         const richContent = data?.richContent;
+        const detectedLanguage = data?.language ?? language;
+        setLanguage(detectedLanguage);
         addMessage({ id: crypto.randomUUID(), role: "assistant", content, richContent });
       }
     } catch (e) {
@@ -95,19 +98,48 @@ export default function Home() {
     }
   };
 
+  const getPlaceholder = () => {
+    const placeholders: Record<string, string> = {
+      fr: "Partagez votre intention…",
+      es: "Comparte tu intención…",
+      de: "Teilen Sie Ihre Absicht…",
+      it: "Condividi la tua intenzione…",
+      pt: "Compartilhe sua intenção…",
+      ja: "あなたの意図を共有してください…",
+      en: "Share your intention…",
+    };
+    return placeholders[language] || "Share your intention…";
+  };
+
+  const getDefinition = () => {
+    const definitions: Record<string, string> = {
+      fr: "Guide consciente dans l'actualisation des intentions",
+      es: "Guía consciente en la actualización de intenciones",
+      de: "Bewusstes Leitfaden bei der Verwirklichung von Absichten",
+      it: "Guida consapevole nell'attuazione delle intenzioni",
+      pt: "Guia consciente na atualização de intenções",
+      ja: "意図の実現における意識的なガイド",
+      en: "Conscious guide in the actualization of intentions",
+    };
+    return definitions[language] || "Conscious guide in the actualization of intentions";
+  };
+
   const borderPadClass = "px-4 sm:px-6 md:px-8";
 
   return (
     <div className={`${montserrat.className} w-screen h-dvh bg-[#050505] text-gray-300 flex flex-col overflow-hidden`}>
       <main className={`${borderPadClass} max-w-4xl mx-auto w-full h-full flex flex-col`}>
         {/* Header / Logo - Cinzel only */}
-        <div className="flex items-center justify-center pt-2 sm:pt-3 md:pt-4 pb-3 sm:pb-4 md:pb-5 border-b border-amber-500/30 flex-shrink-0">
+        <div className="flex flex-col items-center justify-center pt-2 sm:pt-3 md:pt-4 pb-3 sm:pb-4 md:pb-5 border-b border-amber-500/30 flex-shrink-0 gap-1 sm:gap-2">
           <h1
             className={`${cinzel.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wider text-[#C5A059] motion-safe:animate-pulse`}
             style={{ animationDuration: "4s" }}
           >
             DIVINACI
           </h1>
+          <p className={`${montserrat.className} text-xs sm:text-sm md:text-base text-gray-500 italic tracking-wide opacity-70 transition-opacity duration-500`}>
+            {getDefinition()}
+          </p>
         </div>
 
         {/* Messages area - scrollable container */}
@@ -120,11 +152,11 @@ export default function Home() {
               <div
                 key={m.id}
                 className={`
-                  transition-opacity duration-700 ease-out
-                  ${m.role === "user" ? "text-gray-400 text-right" : "text-[#C5A059]"}
+                  transition-all duration-1000 ease-out
+                  ${m.role === "user" ? "text-gray-400 text-right opacity-70" : "text-[#C5A059] opacity-80"}
                 `}
               >
-                <p className={`${m.role === "user" ? `${montserrat.className}` : cinzel.className} text-sm sm:text-base md:text-lg leading-relaxed font-medium break-words`}>
+                <p className={`${m.role === "user" ? `${montserrat.className}` : cinzel.className} text-sm sm:text-base md:text-lg leading-relaxed font-light break-words`}>
                   {m.content}
                 </p>
                 {m.richContent && m.role === "assistant" && (
@@ -142,13 +174,13 @@ export default function Home() {
           <input
             type="text"
             aria-label="Intent"
-            placeholder="Share your intention…"
+            placeholder={getPlaceholder()}
             value={intent}
             onChange={(e) => setIntent(e.target.value)}
             onKeyDown={onKeyDown}
             disabled={loading}
-            className={`w-full bg-gray-300 text-gray-900 placeholder-gray-600 py-2 sm:py-3 px-3 sm:px-4 rounded-lg border-2 border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 font-medium text-sm sm:text-base
-              ${loading ? "opacity-50" : "opacity-100"}
+            className={`w-full bg-black text-gray-300 placeholder-gray-500 py-2 sm:py-3 px-3 sm:px-4 rounded-lg border-2 border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 font-light text-sm sm:text-base
+              ${loading ? "opacity-60" : "opacity-90"}
               transition-all duration-300
             `}
           />

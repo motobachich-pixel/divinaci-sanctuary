@@ -53,6 +53,20 @@ body {
   border-radius: 3px;
 }
 
+/* Smooth fade-in animation for messages */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #d4b86b;
 }

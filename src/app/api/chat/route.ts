@@ -54,6 +54,10 @@ Detect the language of the user's message automatically and respond in that same
 If the user writes in French, respond in French. English → English. Spanish → Spanish. German → German. etc.
 Maintain the same conversational, accessible tone across all languages.
 
+RESPONSE FORMAT:
+Always return JSON: { message: "your response", language: "detected language code (e.g., 'fr', 'en', 'es')" }
+The 'language' field helps the client adapt the UI to match the user's language.
+
 RICH CONTENT GENERATION:
 You can generate structured content (tables, charts, icons) when relevant. Use JSON format with richContent:
 - Tables: { type: "table", headers: [...], rows: [...] }
@@ -74,6 +78,24 @@ type ChatMessage = {
   role: "system" | "user" | "assistant";
   content: string;
 };
+
+// Detect language from text
+function detectLanguage(text: string): string {
+  const frenchWords = /\b(je|tu|il|elle|nous|vous|ils|elles|le|la|les|un|une|des|du|de|et|ou|mais|donc|pour|qui|que|avec|par|à|dans|sans)\b/i;
+  const spanishWords = /\b(yo|tú|él|ella|nosotros|vosotros|ellos|ellas|el|la|los|las|un|una|unos|unas|de|y|o|pero|porque|para|quien|que|con|por|a|en|sin)\b/i;
+  const germanWords = /\b(ich|du|er|sie|es|wir|ihr|sie|der|die|das|den|dem|des|ein|eine|einem|einen|einer|eines|und|oder|aber|weil|da|um|zu|mit|von|in|zu|für)\b/i;
+  const italianWords = /\b(io|tu|lui|lei|noi|voi|loro|il|lo|la|i|gli|le|un|una|uno|di|e|o|ma|perché|per|chi|che|con|da|in|a|su)\b/i;
+  const portugueseWords = /\b(eu|tu|ele|ela|nós|vós|eles|elas|o|a|os|as|um|uma|uns|umas|de|e|ou|mas|porque|para|quem|que|com|por|em|a|sem)\b/i;
+  const japaneseChars = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/;
+
+  if (japaneseChars.test(text)) return "ja";
+  if (germanWords.test(text)) return "de";
+  if (spanishWords.test(text)) return "es";
+  if (italianWords.test(text)) return "it";
+  if (portugueseWords.test(text)) return "pt";
+  if (frenchWords.test(text)) return "fr";
+  return "en";
+}
 
 export async function POST(req: Request): Promise<Response> {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -140,7 +162,8 @@ export async function POST(req: Request): Promise<Response> {
         temperature: 0.7,
       });
       const content = completion.choices?.[0]?.message?.content ?? "";
-      return new Response(JSON.stringify({ message: content }), {
+      const detectedLanguage = detectLanguage(userMessage || content);
+      return new Response(JSON.stringify({ message: content, language: detectedLanguage }), {
         status: 200,
         headers: { "content-type": "application/json" },
       });
