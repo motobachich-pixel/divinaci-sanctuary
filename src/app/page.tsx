@@ -48,6 +48,27 @@ export default function Home() {
     return "en";
   };
 
+  const formatText = (text: string): string => {
+    // Lowercase everything, then capitalize first letter
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
+  const parseRichContent = (text: string): { content: string; richContent?: any } => {
+    // Look for {JSON}...{/JSON} pattern
+    const jsonMatch = text.match(/\{JSON\}(.*?)\{\/JSON\}/);
+    if (jsonMatch) {
+      const jsonStr = jsonMatch[1];
+      const plainText = text.replace(/\{JSON\}.*?\{\/JSON\}/, "").trim();
+      try {
+        const richContent = JSON.parse(jsonStr);
+        return { content: plainText, richContent };
+      } catch (e) {
+        return { content: text };
+      }
+    }
+    return { content: text };
+  };
+
   const sendIntent = async () => {
     const trimmed = intent.trim();
     if (!trimmed || loading) return;
@@ -87,14 +108,16 @@ export default function Home() {
             if (done) break;
             const chunk = decoder.decode(value, { stream: true });
             aggregated += chunk;
+            const { content, richContent } = parseRichContent(aggregated);
             setMessages((prev) =>
-              prev.map((m) => (m.id === id ? { ...m, content: aggregated } : m))
+              prev.map((m) => (m.id === id ? { ...m, content, richContent } : m))
             );
           }
         } else {
           // No stream visibility, fallback to single message
           const text = await res.text();
-          addMessage({ id: crypto.randomUUID(), role: "assistant", content: text });
+          const { content, richContent } = parseRichContent(text);
+          addMessage({ id: crypto.randomUUID(), role: "assistant", content, richContent });
         }
       } else {
         // Fallback: treat as text
@@ -173,8 +196,8 @@ export default function Home() {
                   ${m.role === "user" ? "text-gray-400 text-right opacity-70" : "text-[#C5A059] opacity-80"}
                 `}
               >
-                <p className={`${m.role === "user" ? `${montserrat.className}` : cinzel.className} text-sm sm:text-base md:text-lg leading-relaxed font-light break-words message-text`}>
-                  {m.content}
+                <p className={`${m.role === "user" ? `${montserrat.className}` : montserrat.className} text-sm sm:text-base md:text-lg leading-relaxed font-light break-words`}>
+                  {formatText(m.content)}
                 </p>
                 {m.richContent && m.role === "assistant" && (
                   <div className="mt-3 bg-gray-800/30 p-3 rounded-lg border border-[#C5A059]/20">
