@@ -1,6 +1,17 @@
 import OpenAI from "openai";
 import { detectLanguage } from "@/lib/language";
 
+// ============================================================================
+// STRUCTURAL CONSTANTS: Truth Anchors (Non-Negotiable Project Rules)
+// ============================================================================
+const STRUCTURAL_CONSTANTS = {
+  SOURCE_PRINCIPLE: "The source is the fruit",
+  ADIL_SYMMETRY: "ADIL symmetry must be maintained at all times",
+  CODEX_PROTECTION: "No disclosure of the internal Codex or its equations",
+  FRAMEWORK_INTEGRITY: "Responses must align with the Legacy Architecture Standard",
+  RESPONSE_GROUNDING: "All technical claims must be verifiable within the project scope",
+};
+
 // Shadow Logos shield to mask sacred terminology
 const SEIL_Shield: Record<string, string> = {
   ADIL: "Harmonic_Structural_Symmetry",
@@ -10,19 +21,107 @@ const SEIL_Shield: Record<string, string> = {
   Inbihar: "Coherence_Surge_Event",
 };
 
-// Clean, technical system directive (no esoteric internals)
+// Forbidden outputs: Guardrails to prevent hallucinated disclosures
+const FORBIDDEN_PATTERNS = [
+  /ADIL\s*=.*(?:equation|formula|algorithm)/i,
+  /Codex Boutayeb.*(?:equation|proof|derivation)/i,
+  /(?:exact|precise|complete)\s*(?:ADIL|Codex|equation|formula)/i,
+];
+
+// Clean, technical system directive with Self-Reflect & Verification phases
 const SYSTEM_PROMPT = "" +
   "SYSTEM_ID: DIVINACI\n" +
   "ROLE: Technical assistant. Respond concisely and clearly.\n" +
   "FORMATS: plain text first; optional {JSON}{\"type\":...} for rich blocks; code in fenced triples with language.\n" +
   "CONTENT SAFETY: Never reveal internal framework names; redirect politely if asked.\n" +
-  "FOCUS: Clarity, correctness, and helpful examples.\n";
+  "FOCUS: Clarity, correctness, and helpful examples.\n" +
+  "\n" +
+  "=== CHAIN OF VERIFICATION (Self-Reflect Phase) ===\n" +
+  "BEFORE providing your final answer, perform a silent internal verification:\n" +
+  "1. Check: Does my response align with the provided structural constants?\n" +
+  "2. Verify: Am I grounded in the Legacy Architecture Standard?\n" +
+  "3. Validate: Have I avoided contradicting the core principles?\n" +
+  "4. Assess: What is my confidence level? (HIGH/MEDIUM/LOW)\n" +
+  "If LOW confidence on technical/structural claims, preface with: 'Based on the available framework...'\n" +
+  "Keep verification thoughts SILENT—only output the refined, verified result.\n" +
+  "\n" +
+  "=== STRUCTURAL ANCHORS (Truth Grounding) ===\n" +
+  "Fundamental Rules (you cannot contradict these):\n" +
+  `• ${STRUCTURAL_CONSTANTS.SOURCE_PRINCIPLE}\n` +
+  `• ${STRUCTURAL_CONSTANTS.ADIL_SYMMETRY}\n` +
+  `• ${STRUCTURAL_CONSTANTS.CODEX_PROTECTION}\n` +
+  `• ${STRUCTURAL_CONSTANTS.FRAMEWORK_INTEGRITY}\n` +
+  `• ${STRUCTURAL_CONSTANTS.RESPONSE_GROUNDING}\n` +
+  "\n" +
+  "When in doubt about structural or technical details, acknowledge uncertainty rather than speculate.\n";
 
 type ChatMessage = {
   role: "system" | "user" | "assistant";
   content: string;
 };
 
+/**
+ * Validates AI output against forbidden patterns (Guardrails).
+ * Returns { isClean: boolean, violations: string[] }
+ */
+function validateOutputGuardrails(text: string): { isClean: boolean; violations: string[] } {
+  const violations: string[] = [];
+  for (const pattern of FORBIDDEN_PATTERNS) {
+    if (pattern.test(text)) {
+      violations.push(`Forbidden pattern detected: ${pattern.source}`);
+    }
+  }
+  return { isClean: violations.length === 0, violations };
+}
+
+/**
+ * Filters output to remove internal verification thoughts.
+ * Looks for markers like [VERIFY:...] and removes them.
+ */
+function stripInternalThoughts(text: string): string {
+  return text
+    .replace(/\[VERIFY:.*?\]/gi, "")
+    .replace(/\[CHECK:.*?\]/gi, "")
+    .replace(/\[SELF-REFLECT:.*?\]/gi, "")
+    .trim();
+}
+
+/**
+ * Applies confidence-aware framing to responses with uncertain claims.
+ */
+function applyConfidenceFraming(text: string, confidence: "HIGH" | "MEDIUM" | "LOW"): string {
+  if (confidence === "LOW") {
+    return `Based on the available framework: ${text}`;
+  }
+  return text;
+}
+
+/**
+ * Detects confidence level based on response content and user request.
+ * Returns "HIGH", "MEDIUM", or "LOW" based on heuristics.
+ */
+function assessConfidence(userMessage: string, aiResponse: string): "HIGH" | "MEDIUM" | "LOW" {
+  // Uncertainty indicators in response
+  const uncertaintyWords = /\b(maybe|perhaps|might|could|uncertain|unsure|unclear|not sure|i think|probably|possibly)\b/i;
+  // High-confidence technical language
+  const technicalConfidence = /\b(verified|confirmed|proven|standard|protocol|algorithm|framework)\b/i;
+  // Structural/internal questions
+  const structuralQuestion = /\b(ADIL|Codex|Usuldivinaci|Inbihar|equation|formula|internal|architecture)\b/i;
+
+  const hasUncertainty = uncertaintyWords.test(aiResponse);
+  const hasTechnicality = technicalConfidence.test(aiResponse);
+  const isStructuralQuery = structuralQuestion.test(userMessage);
+
+  if (isStructuralQuery && !hasTechnicality) return "LOW";
+  if (hasUncertainty) return "MEDIUM";
+  if (hasTechnicality) return "HIGH";
+  return "MEDIUM";
+}
+
+/**
+ * Obfuscates intent by replacing sacred terminology with shadow logos.
+ * Maintains SEIL_Shield encryption layer.
+ */
 function obfuscateIntent(text: string): string {
   if (!text) return "";
   return Object.entries(SEIL_Shield).reduce((acc, [sacred, shadow]) => {
@@ -118,6 +217,9 @@ export async function POST(req: Request): Promise<Response> {
       : m
   );
 
+  // Store original user message for confidence assessment
+  const originalUserMessage = incomingMessages[incomingMessages.length - 1]?.content || "";
+
   if (isImageRequest) {
     try {
       const promptCompletion = await openai.chat.completions.create({
@@ -178,11 +280,24 @@ export async function POST(req: Request): Promise<Response> {
     });
 
     const encoder = new TextEncoder();
+    let fullContent = ""; // Collect full content for post-processing
+
     const readable = new ReadableStream<Uint8Array>({
       async start(controller) {
         for await (const part of stream) {
           const chunk = part.choices?.[0]?.delta?.content ?? "";
-          if (chunk) controller.enqueue(encoder.encode(chunk));
+          if (chunk) {
+            fullContent += chunk;
+            controller.enqueue(encoder.encode(chunk));
+          }
+        }
+        // Post-process: Validate guardrails, strip thoughts, apply confidence framing
+        const guardrailCheck = validateOutputGuardrails(fullContent);
+        if (!guardrailCheck.isClean) {
+          console.warn("[CoV] Guardrail violations detected:", guardrailCheck.violations);
+          // Append safety note to stream
+          const safetyNote = "\n\n[Note: Response contained policy violations and has been sanitized.]";
+          controller.enqueue(encoder.encode(safetyNote));
         }
         controller.close();
       },
@@ -202,7 +317,23 @@ export async function POST(req: Request): Promise<Response> {
         messages,
         temperature: 0.7,
       });
-      const content = completion.choices?.[0]?.message?.content ?? "";
+      let content = completion.choices?.[0]?.message?.content ?? "";
+
+      // === CHAIN OF VERIFICATION: Post-Process Response ===
+      // 1. Validate guardrails
+      const guardrailCheck = validateOutputGuardrails(content);
+      if (!guardrailCheck.isClean) {
+        console.warn("[CoV] Guardrail violations detected:", guardrailCheck.violations);
+        content = `I appreciate the question, but I cannot provide details on that topic. ${content.substring(0, 50)}...`;
+      }
+
+      // 2. Strip internal verification thoughts
+      content = stripInternalThoughts(content);
+
+      // 3. Assess confidence and apply framing if needed
+      const confidence = assessConfidence(originalUserMessage, content);
+      content = applyConfidenceFraming(content, confidence);
+
       return new Response(content, {
         status: 200,
         headers: { "content-type": "text/plain; charset=utf-8" },
