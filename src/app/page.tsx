@@ -105,7 +105,7 @@ export default function Home() {
         {/* Minimal frame - clean structure */}
         <div className="flex-1 flex flex-col">
           {/* Header / Logo - Cinzel only */}
-          <div className="flex items-center justify-center pt-4 sm:pt-6 md:pt-8 pb-6 sm:pb-8 md:pb-12">
+          <div className="flex items-center justify-center pt-2 sm:pt-3 md:pt-4 pb-3 sm:pb-4 md:pb-5 border-b border-amber-500/30">
             <h1
               className={`${cinzel.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wider text-[#C5A059] motion-safe:animate-pulse`}
               style={{ animationDuration: "4s" }}
@@ -142,25 +142,25 @@ export default function Home() {
           </div>
 
           {/* Input area - minimal, symmetric, sticky */}
-          <div className="border-t border-gray-700/50 sticky bottom-0 bg-[#050505] pt-2 sm:pt-3">
+          <div className="border-t-2 border-amber-500 sticky bottom-0 bg-[#050505] pt-2 sm:pt-3 pb-2 sm:pb-3">
             <input
               type="text"
               aria-label="Intent"
-              placeholder="Intent…"
+              placeholder="Share your intention…"
               value={intent}
               onChange={(e) => setIntent(e.target.value)}
               onKeyDown={onKeyDown}
               disabled={loading}
-              className={`w-full bg-transparent py-2 sm:py-3 px-1 text-sm sm:text-base text-gray-200 placeholder-gray-600 focus:outline-none font-light
+              className={`w-full bg-gray-300 text-gray-900 placeholder-gray-600 py-2 sm:py-3 px-3 sm:px-4 rounded-lg border-2 border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 font-medium text-sm sm:text-base
                 ${loading ? "opacity-50" : "opacity-100"}
-                transition-opacity duration-300
+                transition-all duration-300
               `}
             />
           </div>
 
           {/* Status - minimal */}
           <div className="py-1 sm:py-2 text-xs sm:text-xs tracking-wide text-gray-500 uppercase sticky bottom-0 bg-[#050505]">
-            {loading ? "Processing…" : "Ready"}
+            {loading ? "Thinking…" : "Ready"}
           </div>
         </div>
       </main>
