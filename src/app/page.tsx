@@ -93,12 +93,12 @@ export default function Home() {
   return (
     <div className={`${montserrat.className} min-h-dvh bg-[#050505] text-gray-300`}>
       <main
-        className={`mx-auto ${borderPadClass} max-w-2xl min-h-dvh flex flex-col justify-center`}
+        className={`mx-auto ${borderPadClass} max-w-2xl min-h-dvh flex flex-col`}
       >
         {/* Minimal frame - no border, clean structure */}
         <div className="flex-1 flex flex-col">
           {/* Header / Logo - Cinzel only */}
-          <div className="flex items-center justify-center pb-16">
+          <div className="flex items-center justify-center pt-8 pb-12">
             <h1
               className={`${cinzel.className} text-5xl sm:text-6xl tracking-wider text-[#C5A059] motion-safe:animate-pulse`}
               style={{ animationDuration: "4s" }}
@@ -110,7 +110,7 @@ export default function Home() {
           {/* Messages area - clean, minimal */}
           <div
             ref={listRef}
-            className="flex-1 overflow-y-auto px-0 sm:px-0 mb-12"
+            className="flex-1 overflow-y-auto px-0 sm:px-0 mb-4"
           >
             <div className="space-y-8">
               {messages.map((m) => (
@@ -129,8 +129,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Input area - minimal, symmetric */}
-          <div className="border-t border-gray-700/50">
+          {/* Input area - minimal, symmetric, sticky */}
+          <div className="border-t border-gray-700/50 sticky bottom-0 bg-[#050505]">
             <input
               type="text"
               aria-label="Intent"
@@ -147,7 +147,7 @@ export default function Home() {
           </div>
 
           {/* Status - minimal */}
-          <div className="pt-3 text-xs tracking-wide text-gray-500 uppercase">
+          <div className="pt-3 text-xs tracking-wide text-gray-500 uppercase sticky bottom-0 bg-[#050505]">
             {loading ? "Processing…" : "Ready"}
           </div>
         </div>
