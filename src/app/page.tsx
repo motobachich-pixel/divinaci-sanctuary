@@ -161,16 +161,17 @@ export default function Home() {
         }
         .sidebar-logo {
           font-family: var(--font-cinzel);
-          font-size: clamp(0.75rem, 2.2vmin, 1.3rem);
+          font-size: clamp(0.65rem, 1.8vmin, 1rem);
           font-weight: 100;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.2em;
           color: #C5A059;
-          writing-mode: vertical-rl;
-          transform: rotate(180deg);
           text-align: center;
           opacity: 0.85;
           animation: logoGlow 3s ease-in-out infinite;
           filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.2));
+          writing-mode: horizontal-tb;
+          width: 100%;
+          padding: 0 clamp(0.3rem, 1vmin, 0.8rem);
         }
         .sidebar-button {
           width: clamp(55px, 9vmin, 100px);
