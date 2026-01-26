@@ -547,22 +547,27 @@ NOW START YOUR RESPONSE IN ${languageName}:`,
       const languageValidation = validateResponseLanguage(content, languageCode);
       console.log(`[LanguageValidation] Detected: ${languageValidation.detectedCode}, Valid: ${languageValidation.isValid}`);
       
-      // FORCE re-translation if language doesn't match OR if it's English when we need another language
-      const needsRetranslation = !languageValidation.isValid || 
-        (languageValidation.detectedCode === 'en' && languageCode !== 'en') ||
-        (languageValidation.detectedCode !== languageCode);
-      
-      if (needsRetranslation) {
-        console.warn(`[LanguageValidation] 🔴 LANGUAGE MISMATCH DETECTED! Expected ${languageCode}, got ${languageValidation.detectedCode}`);
-        console.log(`[LanguageValidation] Forcing emergency re-translation to ${languageName}...`);
+      // STRICT: If English detected and we need another language, RE-TRANSLATE IMMEDIATELY
+      if (languageValidation.detectedCode === 'en' && languageCode !== 'en') {
+        console.warn(`[LanguageValidation] 🔴 CRITICAL MISMATCH! Detected English but need ${languageName}. FORCING IMMEDIATE RE-TRANSLATION!`);
         try {
           content = await forceTranslateResponse(content, languageCode, languageName, openai);
-          console.log(`[LanguageValidation] ✅ Re-translation complete`);
-        } catch (translationError) {
-          console.error(`[LanguageValidation] 🔴 CRITICAL: Could not re-translate response`, translationError);
+          console.log(`[LanguageValidation] ✅ Successfully re-translated to ${languageName}`);
+        } catch (error) {
+          console.error(`[LanguageValidation] FAILED to re-translate`, error);
+        }
+      } 
+      // VERIFY: If not matching the expected language, also re-translate
+      else if (!languageValidation.isValid && languageValidation.detectedCode !== languageCode) {
+        console.warn(`[LanguageValidation] ⚠️ Language mismatch: Expected ${languageCode}, detected ${languageValidation.detectedCode}. Re-translating...`);
+        try {
+          content = await forceTranslateResponse(content, languageCode, languageName, openai);
+          console.log(`[LanguageValidation] ✅ Re-translated successfully`);
+        } catch (error) {
+          console.error(`[LanguageValidation] Re-translation failed`, error);
         }
       } else {
-        console.log(`[LanguageValidation] ✅ Language correct: ${languageCode}`);
+        console.log(`[LanguageValidation] ✅ Language verified: ${languageCode}`);
       }
 
       // 4. Calculate Reliability Score using V = (Φ · S) / H^n equation

@@ -87,16 +87,35 @@ export function detectLanguage(text: string): string {
   // Find language with highest score
   let maxScore = 0;
   let detectedLang = 'en';
+  let secondMaxScore = 0;
+  let secondMaxLang = 'en';
   
   for (const [lang, score] of Object.entries(scores)) {
     if (score > maxScore) {
+      secondMaxScore = maxScore;
+      secondMaxLang = detectedLang;
       maxScore = score;
       detectedLang = lang;
+    } else if (score > secondMaxScore) {
+      secondMaxScore = score;
+      secondMaxLang = lang;
     }
   }
   
+  // PRIORITY: If French has decent score (≥1), prefer it over English default
+  if (scores.fr >= 1 && scores.en <= 2) return 'fr';
+  if (scores.es >= 1 && scores.en <= 2) return 'es';
+  if (scores.de >= 1 && scores.en <= 2) return 'de';
+  if (scores.it >= 1 && scores.en <= 2) return 'it';
+  if (scores.pt >= 1 && scores.en <= 2) return 'pt';
+  
   // Require minimum threshold of 2 matches to avoid false positives
   if (maxScore >= 2) {
+    return detectedLang;
+  }
+  
+  // If we have some score (even 1), and it's not English, return it
+  if (maxScore >= 1 && detectedLang !== 'en') {
     return detectedLang;
   }
 
