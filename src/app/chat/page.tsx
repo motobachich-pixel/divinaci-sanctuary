@@ -312,6 +312,8 @@ export default function Chat() {
           display: flex;
           flex-direction: column;
           padding: clamp(1rem, 3vh, 2rem) clamp(0.75rem, 2vw, 1.5rem);
+          width: 100%;
+          transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         /* Header with home link */
@@ -610,6 +612,15 @@ export default function Chat() {
           box-shadow: 0 4px 16px rgba(0,0,0,0.2);
           border-bottom-right-radius: 6px;
         }
+
+        .message-bubble.arabic {
+          direction: rtl;
+          text-align: right;
+          font-family: "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif;
+          letter-spacing: 0.01em;
+          line-height: 1.8;
+          word-spacing: 0.05em;
+        }
         
         /* Typing indicator */
         .typing-indicator {
@@ -841,9 +852,11 @@ export default function Chat() {
               </div>
             ) : (
               <>
-                {messages.map((msg, idx) => (
-                  <div key={idx} className={`message-row ${msg.role}`}>
-                    <div className={`message-avatar ${msg.role}`}>
+                {messages.map((msg, idx) => {
+                  const isArabic = /[\u0600-\u06FF]/.test(msg.content);
+                  return (
+                    <div key={idx} className={`message-row ${msg.role}`}>
+                      <div className={`message-avatar ${msg.role}`}>
                       {msg.role === "assistant" ? (
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                           {/* Ondes de pensée externes */}
@@ -859,12 +872,13 @@ export default function Chat() {
                       ) : (
                         <span></span>
                       )}
+                      </div>
+                      <div className={`message-bubble ${msg.role}${isArabic ? " arabic" : ""}`}>
+                        {formatMessage(msg.content)}
+                      </div>
                     </div>
-                    <div className={`message-bubble ${msg.role}`}>
-                      {formatMessage(msg.content)}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {loading && (
                   <div className="typing-indicator">
                     <div className="message-avatar assistant">

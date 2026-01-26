@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cinzel, Montserrat } from "next/font/google";
 import "./globals.css";
+import Sidebar from "../components/Sidebar";
 
 const cinzel = Cinzel({
   variable: "--font-cinzel",
@@ -28,7 +29,10 @@ export default function RootLayout({
       <body
         className={`${cinzel.variable} ${montserrat.variable} antialiased`}
       >
-        {children}
+        <div className="app-shell">
+          <Sidebar />
+          <main className="page-content">{children}</main>
+        </div>
       </body>
     </html>
   );
