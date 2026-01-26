@@ -40,6 +40,175 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Format text with proper line breaks, lists, and tables
+  const formatMessage = (text: string) => {
+    const lines = text.split(/\n/);
+    const formatted: React.ReactNode[] = [];
+    let currentParagraph: string[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i];
+      const trimmedLine = line.trim();
+
+      // Check for table markdown (lines starting with |)
+      if (trimmedLine.startsWith('|')) {
+        // Flush current paragraph
+        if (currentParagraph.length > 0) {
+          formatted.push(
+            <p key={`p-${formatted.length}`} style={{ marginBottom: '0.8rem', lineHeight: '1.7' }}>
+              {currentParagraph.join(' ')}
+            </p>
+          );
+          currentParagraph = [];
+        }
+
+        // Collect table lines
+        const tableLines: string[] = [];
+        while (i < lines.length && lines[i].trim().startsWith('|')) {
+          tableLines.push(lines[i].trim());
+          i++;
+        }
+
+        // Parse table
+        if (tableLines.length >= 2) {
+          const headerLine = tableLines[0].split('|').map(cell => cell.trim()).filter(cell => cell);
+          const isTableFormat = tableLines[1].match(/^(\s*[-:]+\s*\|)+\s*[-:]+\s*$/) || tableLines[1].includes('---');
+
+          if (isTableFormat && headerLine.length > 0) {
+            const bodyLines = tableLines.slice(2).map(line =>
+              line.split('|').map(cell => cell.trim()).filter(cell => cell)
+            );
+
+            formatted.push(
+              <div key={`table-${formatted.length}`} style={{ overflowX: 'auto', marginBottom: '1.2rem' }}>
+                <table style={{
+                  borderCollapse: 'collapse',
+                  width: '100%',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  fontSize: '0.9rem'
+                }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(197,160,89,0.15)', borderBottom: '2px solid rgba(197,160,89,0.3)' }}>
+                      {headerLine.map((header, hIdx) => (
+                        <th key={`h-${hIdx}`} style={{
+                          padding: '0.75rem 1rem',
+                          textAlign: 'left',
+                          color: '#d7bb72',
+                          fontWeight: '600',
+                          borderRight: hIdx < headerLine.length - 1 ? '1px solid rgba(197,160,89,0.2)' : 'none'
+                        }}>
+                          {header.replace(/\*\*/g, '')}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bodyLines.map((row, rIdx) => (
+                      <tr key={`r-${rIdx}`} style={{
+                        background: rIdx % 2 === 0 ? 'rgba(197,160,89,0.08)' : 'transparent',
+                        borderBottom: '1px solid rgba(197,160,89,0.1)'
+                      }}>
+                        {row.map((cell, cIdx) => (
+                          <td key={`c-${rIdx}-${cIdx}`} style={{
+                            padding: '0.7rem 1rem',
+                            color: '#e9e0c9',
+                            borderRight: cIdx < row.length - 1 ? '1px solid rgba(197,160,89,0.1)' : 'none'
+                          }}>
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          }
+        }
+        continue;
+      }
+
+      // Check if line starts with number (1. 2. etc.) followed by bold text and dash/colon
+      const numberedMatch = trimmedLine.match(/^(\d+)\.\s*\*\*(.+?)\*\*\s*[-:]\s*(.+)$/);
+      if (numberedMatch) {
+        // Flush current paragraph
+        if (currentParagraph.length > 0) {
+          formatted.push(
+            <p key={`p-${formatted.length}`} style={{ marginBottom: '0.8rem', lineHeight: '1.7' }}>
+              {currentParagraph.join(' ')}
+            </p>
+          );
+          currentParagraph = [];
+        }
+        // Add numbered item with title and description
+        formatted.push(
+          <div key={`num-${formatted.length}`} style={{ marginBottom: '1rem', paddingLeft: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline' }}>
+              <span style={{ color: '#C5A059', fontWeight: '600', minWidth: '1.5rem' }}>
+                {numberedMatch[1]}.
+              </span>
+              <div>
+                <strong style={{ color: '#d7bb72', display: 'block', marginBottom: '0.25rem' }}>
+                  {numberedMatch[2]}
+                </strong>
+                <span style={{ color: '#e9e0c9', opacity: 0.95, lineHeight: '1.6' }}>
+                  {numberedMatch[3]}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      // Check for simple numbered items without bold
+      else if (trimmedLine.match(/^\d+\.\s+/)) {
+        if (currentParagraph.length > 0) {
+          formatted.push(
+            <p key={`p-${formatted.length}`} style={{ marginBottom: '0.8rem', lineHeight: '1.7' }}>
+              {currentParagraph.join(' ')}
+            </p>
+          );
+          currentParagraph = [];
+        }
+        formatted.push(
+          <div key={`item-${formatted.length}`} style={{ marginBottom: '0.6rem', paddingLeft: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+            <span style={{ color: '#C5A059', fontWeight: '600' }}>{trimmedLine.match(/^(\d+)\./)?.[1]}.</span>
+            <span>{trimmedLine.replace(/^\d+\.\s+/, '')}</span>
+          </div>
+        );
+      }
+      // Empty line = paragraph break
+      else if (trimmedLine === '') {
+        if (currentParagraph.length > 0) {
+          formatted.push(
+            <p key={`p-${formatted.length}`} style={{ marginBottom: '0.8rem', lineHeight: '1.7' }}>
+              {currentParagraph.join(' ')}
+            </p>
+          );
+          currentParagraph = [];
+        }
+      }
+      // Regular text
+      else if (trimmedLine) {
+        currentParagraph.push(trimmedLine);
+      }
+
+      i++;
+    }
+
+    // Flush remaining paragraph
+    if (currentParagraph.length > 0) {
+      formatted.push(
+        <p key={`p-final`} style={{ marginBottom: '0.8rem', lineHeight: '1.7' }}>
+          {currentParagraph.join(' ')}
+        </p>
+      );
+    }
+
+    return formatted.length > 0 ? <>{formatted}</> : text;
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -692,7 +861,7 @@ export default function Chat() {
                       )}
                     </div>
                     <div className={`message-bubble ${msg.role}`}>
-                      {msg.content}
+                      {formatMessage(msg.content)}
                     </div>
                   </div>
                 ))}
