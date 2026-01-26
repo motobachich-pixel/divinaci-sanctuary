@@ -30,79 +30,75 @@ export function detectLanguage(text: string): string {
     return "ru"; // default Cyrillic
   }
 
-  // Latin: Strict multi-keyword matching to avoid false positives
+  // Latin: Score-based matching for accurate detection
+  const scores: Record<string, number> = {
+    fr: 0,
+    en: 0,
+    es: 0,
+    de: 0,
+    it: 0,
+    pt: 0,
+    nl: 0,
+  };
+
+  // French: comprehensive keywords including common short words
+  const frWords = ['je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles', 'être', 'avoir', 'aller', 'faire', 'pouvoir', 'vouloir', 'devoir', 'est', 'sont', 'suis', 'ai', 'avez', 'allez', 'comment', 'quoi', 'où', 'quand', 'pourquoi', 'qui', 'quel', 'quelle', 'avec', 'sans', 'dans', 'sur', 'sous', 'pour', 'par', 'mais', 'donc', 'ou', 'car', 'ni', 'bonjour', 'salut', 'merci', 'sil', 'svp', 'aujourdhui', 'ça', 'va'];
+  const frRegex = new RegExp(`\\b(${frWords.join('|')})\\b`, 'g');
+  scores.fr = (t.match(frRegex) || []).length;
   
-  // English: match 3+ common function words
-  const enKeywords = /\b(the|is|are|have|has|do|does|did|will|would|should|could|be|been|being|a|an|and|or|but|if|then|what|which|who|when|where|why|how)\b/g;
-  if ((t.match(enKeywords) || []).length >= 3) return "en";
+  // Check for French contractions and accents
+  if (/\b(c'est|qu'|l'|d'|j'|n'|m'|t'|s')\b/.test(t)) scores.fr += 2;
+  if (/[àâçèéêëîïôùûü]/.test(t)) scores.fr += 1;
 
-  // French: match 3+ French-specific words
-  const frKeywords = /\b(je|tu|il|elle|nous|vous|ils|elles|être|avoir|aller|faire|pouvoir|vouloir|devoir|qu'|c'est|l'|d'|à|au|aux)\b/g;
-  if ((t.match(frKeywords) || []).length >= 3) return "fr";
+  // English: comprehensive keywords
+  const enWords = ['the', 'is', 'are', 'have', 'has', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'be', 'been', 'being', 'a', 'an', 'and', 'or', 'but', 'if', 'then', 'what', 'which', 'who', 'when', 'where', 'why', 'how', 'this', 'that', 'these', 'those', 'can', 'may', 'might', 'must', 'shall', 'with', 'from', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'hello', 'hi', 'thanks', 'please', 'today', 'yes', 'no'];
+  const enRegex = new RegExp(`\\b(${enWords.join('|')})\\b`, 'g');
+  scores.en = (t.match(enRegex) || []).length;
 
-  // Spanish: match 3+ Spanish-specific words
-  const esKeywords = /\b(yo|tú|él|ella|nosotros|vosotros|ellos|ser|estar|tener|hacer|poder|querer|decir|dar|ir|venir|ver|hablar)\b/g;
-  if ((t.match(esKeywords) || []).length >= 3) return "es";
+  // Spanish: comprehensive keywords  
+  const esWords = ['yo', 'tú', 'él', 'ella', 'nosotros', 'vosotros', 'ellos', 'ser', 'estar', 'tener', 'hacer', 'poder', 'querer', 'decir', 'dar', 'ir', 'venir', 'ver', 'hablar', 'es', 'son', 'estoy', 'está', 'están', 'tengo', 'tiene', 'tienen', 'hago', 'hace', 'hacen', 'qué', 'cómo', 'dónde', 'cuándo', 'por', 'qué', 'quién', 'con', 'sin', 'para', 'pero', 'hola', 'gracias', 'por', 'favor', 'hoy'];
+  const esRegex = new RegExp(`\\b(${esWords.join('|')})\\b`, 'g');
+  scores.es = (t.match(esRegex) || []).length;
+  if (/[áéíóúñ¿¡]/.test(t)) scores.es += 1;
 
-  // German: match 3+ German-specific words
-  const deKeywords = /\b(ich|du|er|sie|es|wir|ihr|der|die|das|den|dem|des|ein|eine|sein|haben|werden|können|wollen)\b/g;
-  if ((t.match(deKeywords) || []).length >= 3) return "de";
+  // German: comprehensive keywords
+  const deWords = ['ich', 'du', 'er', 'sie', 'es', 'wir', 'ihr', 'der', 'die', 'das', 'den', 'dem', 'des', 'ein', 'eine', 'sein', 'haben', 'werden', 'können', 'wollen', 'ist', 'sind', 'bin', 'habe', 'hat', 'haben', 'wird', 'kann', 'will', 'was', 'wie', 'wo', 'wann', 'warum', 'wer', 'mit', 'ohne', 'für', 'aber', 'und', 'oder', 'nicht', 'hallo', 'danke', 'bitte', 'heute'];
+  const deRegex = new RegExp(`\\b(${deWords.join('|')})\\b`, 'g');
+  scores.de = (t.match(deRegex) || []).length;
+  if (/[äöüß]/.test(t)) scores.de += 1;
 
-  // Italian: match 3+ Italian-specific words
-  const itKeywords = /\b(io|tu|lui|lei|noi|voi|loro|essere|avere|andare|fare|potere|volere|dovere|dire|dare|venire)\b/g;
-  if ((t.match(itKeywords) || []).length >= 3) return "it";
+  // Italian: comprehensive keywords
+  const itWords = ['io', 'tu', 'lui', 'lei', 'noi', 'voi', 'loro', 'essere', 'avere', 'andare', 'fare', 'potere', 'volere', 'dovere', 'dire', 'dare', 'venire', 'sono', 'sei', 'è', 'siamo', 'siete', 'ho', 'hai', 'ha', 'abbiamo', 'avete', 'hanno', 'cosa', 'come', 'dove', 'quando', 'perché', 'chi', 'con', 'senza', 'per', 'ma', 'ciao', 'grazie', 'prego', 'oggi'];
+  const itRegex = new RegExp(`\\b(${itWords.join('|')})\\b`, 'g');
+  scores.it = (t.match(itRegex) || []).length;
+  if (/[àèéìòù]/.test(t)) scores.it += 1;
 
-  // Portuguese: match 3+ Portuguese-specific words
-  const ptKeywords = /\b(eu|tu|ele|ela|nós|vós|eles|elas|ser|estar|ter|fazer|poder|querer|dizer|dar|ir|vir|ver|falar)\b/g;
-  if ((t.match(ptKeywords) || []).length >= 3) return "pt";
+  // Portuguese: comprehensive keywords
+  const ptWords = ['eu', 'tu', 'ele', 'ela', 'nós', 'vós', 'eles', 'elas', 'ser', 'estar', 'ter', 'fazer', 'poder', 'querer', 'dizer', 'dar', 'ir', 'vir', 'ver', 'falar', 'sou', 'és', 'é', 'somos', 'são', 'tenho', 'tens', 'tem', 'temos', 'têm', 'o', 'que', 'como', 'onde', 'quando', 'por', 'quê', 'quem', 'com', 'sem', 'para', 'mas', 'olá', 'obrigado', 'obrigada', 'por', 'favor', 'hoje'];
+  const ptRegex = new RegExp(`\\b(${ptWords.join('|')})\\b`, 'g');
+  scores.pt = (t.match(ptRegex) || []).length;
+  if (/[ãõáéíóúâêôç]/.test(t)) scores.pt += 1;
 
-  // Romanian: match 3+ Romanian-specific words (careful: overlap with Latin languages)
-  const roKeywords = /\b(eu|tu|el|ea|noi|voi|lor|sunt|ești|este|suntem|sunteți|fi|avea|face|putea|vrea|zice|da|merge)\b/g;
-  if ((t.match(roKeywords) || []).length >= 3) return "ro";
+  // Dutch: comprehensive keywords
+  const nlWords = ['ik', 'je', 'hij', 'zij', 'wij', 'u', 'ze', 'de', 'het', 'een', 'zijn', 'hebben', 'worden', 'kunnen', 'willen', 'moeten', 'zullen', 'gaan', 'doen', 'zeggen', 'ben', 'bent', 'is', 'heb', 'hebt', 'heeft', 'wat', 'hoe', 'waar', 'wanneer', 'waarom', 'wie', 'met', 'zonder', 'voor', 'maar', 'en', 'of', 'hallo', 'dank', 'alsjeblieft', 'vandaag'];
+  const nlRegex = new RegExp(`\\b(${nlWords.join('|')})\\b`, 'g');
+  scores.nl = (t.match(nlRegex) || []).length;
 
-  // Dutch: match 3+ Dutch-specific words
-  const nlKeywords = /\b(ik|je|hij|zij|wij|u|ze|de|het|een|zijn|hebben|worden|kunnen|willen|moeten|zullen|gaan|doen|zeggen)\b/g;
-  if ((t.match(nlKeywords) || []).length >= 3) return "nl";
-
-  // Polish: match 3+ Polish-specific words
-  const plKeywords = /\b(ja|ty|on|ona|ono|my|wy|oni|one|być|mieć|robić|móc|chcieć|powiedzieć|dać|iść|przyjść|widzieć|mówić)\b/g;
-  if ((t.match(plKeywords) || []).length >= 3) return "pl";
-
-  // Swedish: match 3+ Swedish-specific words
-  const svKeywords = /\b(jag|du|han|hon|vi|ni|de|vara|ha|gå|kunna|vilja|måste|ska|säga|ge|komma|se|tala)\b/g;
-  if ((t.match(svKeywords) || []).length >= 3) return "sv";
-
-  // Norwegian: match 3+ Norwegian-specific words
-  const noKeywords = /\b(jeg|du|han|hun|vi|dere|de|være|ha|gå|kunne|ville|må|skal|si|gi|komme|se|snakke)\b/g;
-  if ((t.match(noKeywords) || []).length >= 3) return "no";
-
-  // Danish: match 3+ Danish-specific words
-  const daKeywords = /\b(jeg|du|han|hun|vi|de|være|have|gå|kunne|ville|skal|sige|give|komme|se|tale)\b/g;
-  if ((t.match(daKeywords) || []).length >= 3) return "da";
-
-  // Finnish: match 3+ Finnish-specific words
-  const fiKeywords = /\b(minä|sinä|hän|se|me|te|he|olla|omistaa|mennä|voida|haluta|pitää|sanoa|antaa|tulla|nähdä|puhua)\b/g;
-  if ((t.match(fiKeywords) || []).length >= 3) return "fi";
-
-  // Czech: match 3+ Czech-specific words
-  const csKeywords = /\b(já|ty|on|ona|ono|my|vy|oni|ony|být|mít|jít|moci|chtít|muset|říci|dát|přijít|vidět|mluvit)\b/g;
-  if ((t.match(csKeywords) || []).length >= 3) return "cs";
-
-  // Hungarian: match 3+ Hungarian-specific words
-  const huKeywords = /\b(én|te|ő|mi|ti|ők|van|lenni|menni|tudni|akarni|kell|mondani|adni|jönni|látni|beszélni)\b/g;
-  if ((t.match(huKeywords) || []).length >= 3) return "hu";
-
-  // Turkish: match 3+ Turkish-specific words
-  const trKeywords = /\b(ben|sen|o|biz|siz|onlar|olmak|gitmek|gelmek|görmek|konuşmak|söylemek|vermek|almak|yapmak|vermek)\b/g;
-  if ((t.match(trKeywords) || []).length >= 3) return "tr";
-
-  // Ukrainian: match 3+ Ukrainian-specific words (Cyrillic already checked above)
-  const ukKeywords = /\b(я|ти|він|вона|воно|ми|ви|вони|бути|мати|йти|мочи|хотіти|сказати|дати|прийти|бачити|говорити)\b/g;
-  if ((t.match(ukKeywords) || []).length >= 3) return "uk";
-
-  // Indonesian: match 3+ Indonesian-specific words
-  const idKeywords = /\b(saya|anda|dia|kami|kalian|mereka|adalah|mempunyai|pergi|dapat|ingin|harus|berkata|memberi|datang|melihat|berbicara)\b/g;
-  if ((t.match(idKeywords) || []).length >= 3) return "id";
+  // Find language with highest score
+  let maxScore = 0;
+  let detectedLang = 'en';
+  
+  for (const [lang, score] of Object.entries(scores)) {
+    if (score > maxScore) {
+      maxScore = score;
+      detectedLang = lang;
+    }
+  }
+  
+  // Require minimum threshold of 2 matches to avoid false positives
+  if (maxScore >= 2) {
+    return detectedLang;
+  }
 
   // Default to English if nothing matches clearly
   return "en";
