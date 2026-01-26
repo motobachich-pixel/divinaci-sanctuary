@@ -275,22 +275,29 @@ async function forceTranslateResponse(
       messages: [
         {
           role: "system",
-          content: `You are a translation expert. Translate the following text EXACTLY to ${targetLanguageName}. Keep the exact same tone, formatting, and meaning. Do not add or remove any content. Respond ONLY with the translated text, nothing else.`,
+          content: `YOU ARE A TRANSLATION MACHINE. TRANSLATE TO ${targetLanguageName.toUpperCase()} ONLY.
+
+CRITICAL:
+- Translate EVERY word to ${targetLanguageName}
+- Keep EXACT same tone, structure, meaning
+- Do NOT respond in any language except ${targetLanguageName}
+- Do NOT explain, do NOT comment, do NOT summarize
+- ONLY OUTPUT THE TRANSLATED TEXT IN ${targetLanguageName}`,
         },
         {
           role: "user",
-          content: response,
+          content: `Translate this text to ${targetLanguageName}:\n\n${response}`,
         },
       ],
-      temperature: 0.3,
+      temperature: 0.1,
+      max_tokens: Math.min(4000, response.length * 1.3),
     });
 
     const translatedContent = completion.choices?.[0]?.message?.content ?? response;
-    console.log(`[LanguageValidation] Response re-translated from detected language to ${targetLanguageName}`);
+    console.log(`[LanguageValidation] ✅ Translated ${response.length} chars → ${translatedContent.length} chars`);
     return translatedContent;
   } catch (error) {
     console.error(`[LanguageValidation] Translation failed:`, error);
-    // Return original if translation fails
     return response;
   }
 }
@@ -372,26 +379,30 @@ export async function POST(req: Request): Promise<Response> {
   const messagesPreface: ChatMessage[] = [
     {
       role: "system" as const,
-      content: `🔴 CRITICAL INSTRUCTION - LANGUAGE COMPATIBILITY 🔴
+      content: `🔴🔴🔴 URGENT: LANGUAGE LOCK 🔴🔴🔴
 
-YOU MUST RESPOND ENTIRELY AND EXCLUSIVELY IN ${languageName.toUpperCase()}.
+TARGET LANGUAGE: ${languageName.toUpperCase()}
+LANGUAGE CODE: ${languageCode}
 
-REQUIREMENTS:
-1. EVERY WORD, SENTENCE, AND CHARACTER MUST BE IN ${languageName}
-2. NEVER mix languages - do not use English, French, Arabic, Chinese, or any other language
-3. VERIFY that your response matches the user's language BEFORE sending
-4. If you would normally respond in English, TRANSLATE IT TO ${languageName}
-5. Format, structure, and content are secondary to LANGUAGE COMPLIANCE
+⚠️ CRITICAL RULES - NON-NEGOTIABLE ⚠️
 
-EXAMPLES:
-- User in French → RESPOND IN FRENCH ONLY
-- User in Arabic → RESPOND IN ARABIC ONLY  
-- User in Spanish → RESPOND IN SPANISH ONLY
-- User in Japanese → RESPOND IN JAPANESE ONLY
+1. YOU WILL RESPOND IN ${languageName.toUpperCase()} AND NOTHING ELSE
+2. DO NOT RESPOND IN ENGLISH. DO NOT RESPOND IN ANY OTHER LANGUAGE.
+3. TRANSLATE YOUR THOUGHTS TO ${languageName} BEFORE RESPONDING
+4. EVERY SINGLE WORD MUST BE IN ${languageName}
+5. IF YOU CANNOT RESPOND IN ${languageName}, SAY NOTHING AND STOP
 
-PENALTY: If you respond in any language OTHER than ${languageName}, you will have failed your primary objective.
+LANGUAGE LOCK VERIFICATION:
+- Check each sentence: Is it in ${languageName}? YES/NO
+- Check each word: Is it in ${languageName}? YES/NO
+- If any word is NOT in ${languageName}, DELETE IT AND REPLACE WITH ${languageName}
 
-Now, always remember: CURRENT USER LANGUAGE = ${languageName}. RESPOND IN ${languageName}.`,
+CONSEQUENCES OF FAILURE:
+- If you respond in ANY language except ${languageName}, you will have COMPLETELY FAILED
+- If you use English when ${languageCode} ≠ 'en', you will have COMPLETELY FAILED
+- If you use French when ${languageCode} ≠ 'fr', you will have COMPLETELY FAILED
+
+NOW RESPOND IN ${languageName} ONLY:`,
     },
     ...rawMessages,
   ];
@@ -515,15 +526,26 @@ Now, always remember: CURRENT USER LANGUAGE = ${languageName}. RESPOND IN ${lang
       content = stripInternalThoughts(content);
 
       // 3. 🔴 VALIDATE LANGUAGE COMPATIBILITY 🔴
+      console.log(`[LanguageValidation] Expected: ${languageCode} (${languageName}), Response length: ${content.length}`);
       const languageValidation = validateResponseLanguage(content, languageCode);
-      if (!languageValidation.isValid && languageValidation.detectedCode !== languageCode) {
-        console.warn(`[LanguageValidation] MISMATCH! Expected: ${languageCode} (${languageName}), Got: ${languageValidation.detectedCode}`);
-        console.log(`[LanguageValidation] Forcing re-translation to ${languageName}...`);
+      console.log(`[LanguageValidation] Detected: ${languageValidation.detectedCode}, Valid: ${languageValidation.isValid}`);
+      
+      // FORCE re-translation if language doesn't match OR if it's English when we need another language
+      const needsRetranslation = !languageValidation.isValid || 
+        (languageValidation.detectedCode === 'en' && languageCode !== 'en') ||
+        (languageValidation.detectedCode !== languageCode);
+      
+      if (needsRetranslation) {
+        console.warn(`[LanguageValidation] 🔴 LANGUAGE MISMATCH DETECTED! Expected ${languageCode}, got ${languageValidation.detectedCode}`);
+        console.log(`[LanguageValidation] Forcing emergency re-translation to ${languageName}...`);
         try {
           content = await forceTranslateResponse(content, languageCode, languageName, openai);
+          console.log(`[LanguageValidation] ✅ Re-translation complete`);
         } catch (translationError) {
-          console.error(`[LanguageValidation] Critical: Could not re-translate response`, translationError);
+          console.error(`[LanguageValidation] 🔴 CRITICAL: Could not re-translate response`, translationError);
         }
+      } else {
+        console.log(`[LanguageValidation] ✅ Language correct: ${languageCode}`);
       }
 
       // 4. Calculate Reliability Score using V = (Φ · S) / H^n equation
