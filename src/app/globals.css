@@ -96,7 +96,7 @@ body {
   display: grid;
   grid-template-rows: auto 1fr auto;
   padding: 14px;
-  transition: width 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: all;
 }
 
@@ -144,6 +144,8 @@ body {
 .brand-word {
   white-space: nowrap;
   font-size: 0.85rem;
+  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 1;
 }
 
 .sidebar-pin {
@@ -154,12 +156,14 @@ body {
   background: rgba(10, 8, 6, 0.7);
   color: #e9e0c9;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar-pin:hover {
-  border-color: rgba(197, 160, 89, 0.45);
-  background: rgba(197, 160, 89, 0.12);
+  border-color: rgba(197, 160, 89, 0.5);
+  background: rgba(197, 160, 89, 0.18);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 8px 20px rgba(197, 160, 89, 0.25);
 }
 
 .sidebar-nav {
@@ -179,22 +183,32 @@ body {
   text-decoration: none;
   border: 1px solid rgba(197, 160, 89, 0.14);
   background: rgba(255, 255, 255, 0.02);
-  transition: all 0.25s ease;
+  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar-item:hover {
-  border-color: rgba(197, 160, 89, 0.32);
-  background: rgba(197, 160, 89, 0.08);
+  border-color: rgba(197, 160, 89, 0.4);
+  background: rgba(197, 160, 89, 0.12);
   color: #f5e9c9;
-  transform: translateX(2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  transform: translateX(4px) translateY(-1px);
+  box-shadow: 0 12px 32px rgba(197, 160, 89, 0.22);
 }
 
 .sidebar-item.active {
-  border-color: rgba(197, 160, 89, 0.5);
-  background: linear-gradient(145deg, rgba(197, 160, 89, 0.14), rgba(197, 160, 89, 0.06));
+  border-color: rgba(197, 160, 89, 0.55);
+  background: linear-gradient(145deg, rgba(197, 160, 89, 0.18), rgba(197, 160, 89, 0.1));
   color: #f7e9c9;
-  box-shadow: inset 0 1px 3px rgba(197, 160, 89, 0.18), 0 8px 18px rgba(197, 160, 89, 0.16);
+  box-shadow: inset 0 1px 3px rgba(197, 160, 89, 0.22), 0 10px 25px rgba(197, 160, 89, 0.2);
+  animation: activeItemGlow 2s ease-in-out infinite;
+}
+
+@keyframes activeItemGlow {
+  0%, 100% {
+    box-shadow: inset 0 1px 3px rgba(197, 160, 89, 0.22), 0 10px 25px rgba(197, 160, 89, 0.2);
+  }
+  50% {
+    box-shadow: inset 0 1px 3px rgba(197, 160, 89, 0.28), 0 12px 32px rgba(197, 160, 89, 0.28);
+  }
 }
 
 .item-icon {
@@ -208,6 +222,41 @@ body {
   color: #c5a059;
   background: rgba(197, 160, 89, 0.08);
   box-shadow: 0 0 10px rgba(197, 160, 89, 0.18);
+  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: iconHum 3s ease-in-out infinite;
+}
+
+@keyframes iconHum {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.18);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 18px rgba(197, 160, 89, 0.28);
+  }
+}
+
+.sidebar-item:hover .item-icon {
+  transform: scale(1.15) rotate(5deg);
+  background: rgba(197, 160, 89, 0.18);
+  box-shadow: 0 6px 24px rgba(197, 160, 89, 0.35), 0 0 20px rgba(197, 160, 89, 0.25);
+  filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.4));
+}
+
+.sidebar-item.active .item-icon {
+  animation: activeIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes activeIconPulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.3));
+  }
+  50% {
+    transform: scale(1.12) rotate(3deg);
+    filter: drop-shadow(0 0 15px rgba(197, 160, 89, 0.5));
+  }
 }
 
 .item-label {
@@ -230,12 +279,18 @@ body {
   background: rgba(10, 8, 6, 0.7);
   color: #e9e0c9;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar-toggle:hover {
-  border-color: rgba(197, 160, 89, 0.42);
-  background: rgba(197, 160, 89, 0.14);
+  border-color: rgba(197, 160, 89, 0.5);
+  background: rgba(197, 160, 89, 0.18);
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow: 0 8px 24px rgba(197, 160, 89, 0.28);
+}
+
+.sidebar-toggle:active {
+  transform: scale(0.95);
 }
 
 .sidebar-shell.is-collapsed .item-label,
@@ -255,7 +310,7 @@ body {
 
 .page-content {
   margin-left: var(--sidebar-active-width, 260px);
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   min-height: 100vh;
   width: calc(100% - var(--sidebar-active-width, 260px));
   overflow-x: hidden;
