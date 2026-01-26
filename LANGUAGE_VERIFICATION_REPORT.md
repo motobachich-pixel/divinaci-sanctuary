@@ -11,48 +11,50 @@
 
 **Méthode Utilisée:** Système double approche
 
-### 1.1 Scripts Non-Latins
+### 1.1 Scripts Non-Latins *(10 langues)*
 
 **Priorité:** Haute  
 **Technique:** Détection Unicode directe
+
 **Langues Supportées:**
 
-- Arabe (`ar`)
-- Japonais (`ja`)
-- Chinois (`zh`)
-- Russe (`ru`)
-- Grec (`el`)
-- Thaï (`th`)
-- Coréen (`ko`)
-- Hindi (`hi`)
-- Vietnamien (`vi`)
-- Ukrainien (`uk`)
+1. Arabe (`ar`)
+2. Japonais (`ja`)
+3. Chinois (`zh`)
+4. Russe (`ru`)
+5. Grec (`el`)
+6. Thaï (`th`)
+7. Coréen (`ko`)
+8. Hindi (`hi`)
+9. Vietnamien (`vi`)
+10. Ukrainien (`uk`)
 
-### 1.2 Scripts Latins
+### 1.2 Scripts Latins *(7 langues)*
 
 **Priorité:** Moyenne  
 **Technique:** Système scoring mots-clés
-| Langue | Code ISO | Mots-Clés | Bonus Détection |
-|--------|----------|-----------|------------------|
-| Français | `fr` | 47 | Contractions + Accents `àâçèéêëîïôùûü` |
-| Anglais | `en` | 58 | Aucun |
-| Espagnol | `es` | 47 | Accents `áéíóúñ¿¡` |
-| Allemand | `de` | 48 | Accents `äöüß` |
-| Italien | `it` | 43 | Accents `àèéìòù` |
-| Portugais | `pt` | 49 | Accents `ãõáéíóúâêôç` |
-| Néerlandais | `nl` | 44 | Aucun |
 
-**Paramètres de Détection:**
+| # | Langue | Code ISO | Mots-Clés | Bonus Détection |
+|---|--------|----------|-----------|------------------|
+| 1 | Français | `fr` | 47 | Contractions + Accents `àâçèéêëîïôùûü` |
+| 2 | Anglais | `en` | 58 | Aucun |
+| 3 | Espagnol | `es` | 47 | Accents `áéíóúñ¿¡` |
+| 4 | Allemand | `de` | 48 | Accents `äöüß` |
+| 5 | Italien | `it` | 43 | Accents `àèéìòù` |
+| 6 | Portugais | `pt` | 49 | Accents `ãõáéíóúâêôç` |
+| 7 | Néerlandais | `nl` | 44 | Aucun |
 
-- **Seuil Minimal:** 2 correspondances requises
-- **Raison:** Éviter faux positifs entre langues similaires
-- **Fallback:** Anglais (`en`) si score < 2
+**Paramètres de Détection:** *(3 règles)*
+
+1. **Seuil Minimal:** 2 correspondances requises
+2. **Raison:** Éviter faux positifs entre langues similaires
+3. **Fallback:** Anglais (`en`) si score < 2
 
 ## 2. Traduction Automatique
 
 **Fichier Source:** `src/app/api/chat/route.ts`
 
-**Processus d'Intégration:**
+**Processus d'Intégration:** *(2 étapes clés)*
 
 **Étape 1 - Détection** (ligne 279)
 ```typescript
@@ -61,22 +63,47 @@ const detectedLang = detectLanguage(lastUserMessage);
 
 **Étape 2 - Injection Système** (ligne 322)
 ```typescript
-content: `RESPOND ENTIRELY IN ${languageName.toUpperCase()}. Do not translate; always use ${languageName} for your entire response.`
+// Injection directive système
+{
+  role: "system",
+  content: `RESPOND ENTIRELY IN ${languageName.toUpperCase()}. Do not translate; always use ${languageName} for your entire response.`
+}
 ```
 
 **Langues Supportées:** 20+ avec résolution nom complet
 
-**Groupe Européen:**
-- English, French, Spanish, German, Italian
-- Portuguese, Dutch, Polish, Swedish, Norwegian
-- Danish, Finnish, Czech, Hungarian, Romanian
-- Greek, Turkish, Ukrainian
+**Groupe Européen:** *(18 langues)*
+1. English
+2. French
+3. Spanish
+4. German
+5. Italian
+6. Portuguese
+7. Dutch
+8. Polish
+9. Swedish
+10. Norwegian
+11. Danish
+12. Finnish
+13. Czech
+14. Hungarian
+15. Romanian
+16. Greek
+17. Turkish
+18. Ukrainian
 
-**Groupe Asiatique:**
-- Russian, Arabic, Hindi, Japanese, Chinese
-- Korean, Thai, Vietnamese, Indonesian
+**Groupe Asiatique:** *(9 langues)*
+1. Russian
+2. Arabic
+3. Hindi
+4. Japanese
+5. Chinese
+6. Korean
+7. Thai
+8. Vietnamese
+9. Indonesian
 
-**Flux d'Exécution:**
+**Flux d'Exécution:** *(4 phases)*
 
 1. **Analyse Message:** Détection langue via `detectLanguage()`
 2. **Résolution Code:** Conversion ISO vers nom complet  
