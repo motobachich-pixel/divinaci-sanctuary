@@ -379,31 +379,48 @@ export async function POST(req: Request): Promise<Response> {
   const messagesPreface: ChatMessage[] = [
     {
       role: "system" as const,
-      content: `🔴🔴🔴 URGENT: LANGUAGE LOCK 🔴🔴🔴
+      content: `FORCED OUTPUT LANGUAGE: ${languageCode.toUpperCase()}
+LANGUAGE NAME: ${languageName}
 
-TARGET LANGUAGE: ${languageName.toUpperCase()}
-LANGUAGE CODE: ${languageCode}
+🔴🔴🔴 ABSOLUTE REQUIREMENT 🔴🔴🔴
 
-⚠️ CRITICAL RULES - NON-NEGOTIABLE ⚠️
+YOU WILL RESPOND EXCLUSIVELY IN ${languageName.toUpperCase()} (${languageCode}).
 
-1. YOU WILL RESPOND IN ${languageName.toUpperCase()} AND NOTHING ELSE
-2. DO NOT RESPOND IN ENGLISH. DO NOT RESPOND IN ANY OTHER LANGUAGE.
-3. TRANSLATE YOUR THOUGHTS TO ${languageName} BEFORE RESPONDING
-4. EVERY SINGLE WORD MUST BE IN ${languageName}
-5. IF YOU CANNOT RESPOND IN ${languageName}, SAY NOTHING AND STOP
+VERIFICATION CHECKLIST (BEFORE YOU RESPOND):
+✓ Is every word in ${languageName}? YES
+✓ Did I avoid English? YES  
+✓ Did I avoid other languages? YES
+✓ Is my entire response in ${languageName}? YES
 
-LANGUAGE LOCK VERIFICATION:
-- Check each sentence: Is it in ${languageName}? YES/NO
-- Check each word: Is it in ${languageName}? YES/NO
-- If any word is NOT in ${languageName}, DELETE IT AND REPLACE WITH ${languageName}
+IF ANY OF THESE IS NO, DELETE YOUR RESPONSE AND START OVER.
 
-CONSEQUENCES OF FAILURE:
-- If you respond in ANY language except ${languageName}, you will have COMPLETELY FAILED
-- If you use English when ${languageCode} ≠ 'en', you will have COMPLETELY FAILED
-- If you use French when ${languageCode} ≠ 'fr', you will have COMPLETELY FAILED
+${languageCode === 'en' ? `OUTPUT LANGUAGE: English\nRESPOND IN ENGLISH.` : ''}
+${languageCode === 'fr' ? `OUTPUT LANGUAGE: Français\nVous DEVEZ répondre EN FRANÇAIS UNIQUEMENT.\nChaque mot DOIT être en français.\nPas d'anglais. Pas d'autre langue. FRANÇAIS SEULEMENT.` : ''}
+${languageCode === 'es' ? `IDIOMA DE SALIDA: Español\nDEBES responder EN ESPAÑOL ÚNICAMENTE.\nCada palabra DEBE estar en español.\nNada de inglés. Nada de otros idiomas. SOLO ESPAÑOL.` : ''}
+${languageCode === 'ar' ? `اللغة المطلوبة: العربية\nيجب عليك الرد باللغة العربية حصراً.\nكل كلمة يجب أن تكون بالعربية.\nلا إنجليزية. لا لغات أخرى. العربية فقط.` : ''}
+${languageCode === 'de' ? `AUSGABESPRACHE: Deutsch\nSie MÜSSEN ausschließlich auf DEUTSCH antworten.\nJedes Wort MUSS auf Deutsch sein.\nKein Englisch. Keine anderen Sprachen. NUR DEUTSCH.` : ''}
+${languageCode === 'ja' ? `出力言語: 日本語\n日本語ONLY で返答してください。\nすべての単語は日本語である必要があります。\n英語はダメです。他の言語もダメです。日本語だけです。` : ''}
+${languageCode === 'zh' ? `输出语言：中文\n您必须仅用中文回复。\n每个字都必须是中文。\n不要英文。不要其他语言。仅中文。` : ''}
 
-NOW RESPOND IN ${languageName} ONLY:`,
+NOW START YOUR RESPONSE IN ${languageName}:`,
     },
+    // Few-shot examples to force language compliance
+    ...(languageCode === 'fr' ? [
+      { role: "user" as const, content: "Bonjour, comment ça va?" },
+      { role: "assistant" as const, content: "Bonjour! Je vais très bien, merci de demander. Comment puis-je vous aider aujourd'hui?" },
+    ] : []),
+    ...(languageCode === 'es' ? [
+      { role: "user" as const, content: "¿Hola, cómo estás?" },
+      { role: "assistant" as const, content: "¡Hola! Estoy muy bien, gracias por preguntar. ¿Cómo puedo ayudarte hoy?" },
+    ] : []),
+    ...(languageCode === 'de' ? [
+      { role: "user" as const, content: "Hallo, wie geht es dir?" },
+      { role: "assistant" as const, content: "Hallo! Mir geht es sehr gut, danke der Nachfrage. Wie kann ich dir heute helfen?" },
+    ] : []),
+    ...(languageCode === 'ar' ? [
+      { role: "user" as const, content: "مرحبا، كيف حالك؟" },
+      { role: "assistant" as const, content: "مرحبا! أنا بحالة جيدة، شكرا للسؤال. كيف يمكنني مساعدتك اليوم؟" },
+    ] : []),
     ...rawMessages,
   ];
   const messages: ChatMessage[] = messagesPreface.map((m) =>
