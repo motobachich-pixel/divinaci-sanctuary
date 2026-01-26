@@ -1,44 +1,88 @@
-# Rapport de vérification - Fonctionnalités linguistiques DIVINACI
+# Rapport de Vérification Linguistique
 
-## ✅ Statut global: OPÉRATIONNEL
+**Projet:** DIVINACI  
+**Date:** 2026-01-26  
+**Statut:** ✅ OPÉRATIONNEL  
+**Scope:** Détection langue + Traduction automatique
 
-### 1. Détection de langue (`src/lib/language.ts`)
+## 1. Détection de Langue
 
-**Méthode:** Système à double approche
-- **Scripts non-latins:** Détection Unicode (priorité haute)
-  - Arabe (ar), Japonais (ja), Chinois (zh), Russe (ru), Grec (el)
-  - Thaï (th), Coréen (ko), Hindi (hi), Vietnamien (vi), Ukrainien (uk)
-  
-- **Scripts latins:** Système de scoring basé sur mots-clés
-  - Français (fr): 47 mots-clés + détection contractions (c'est, l', d', qu') + accents [àâçèéêëîïôùûü]
-  - Anglais (en): 58 mots-clés (the, is, are, have, etc.)
-  - Espagnol (es): 47 mots-clés + accents [áéíóúñ¿¡]
-  - Allemand (de): 48 mots-clés + accents [äöüß]
-  - Italien (it): 43 mots-clés + accents [àèéìòù]
-  - Portugais (pt): 49 mots-clés + accents [ãõáéíóúâêôç]
-  - Néerlandais (nl): 44 mots-clés
+**Fichier Source:** `src/lib/language.ts`
 
-**Seuil minimal:** 2 correspondances pour éviter faux positifs
-**Fallback:** Anglais (en) si aucune détection claire
+**Méthode Utilisée:** Système double approche
 
-### 2. Traduction automatique des réponses (`src/app/api/chat/route.ts`)
+### 1.1 Scripts Non-Latins
 
-**Ligne 279:** `const detectedLang = detectLanguage(lastUserMessage);`
+**Priorité:** Haute  
+**Technique:** Détection Unicode directe
+**Langues Supportées:**
 
-**Ligne 322:** Injection système forcée
+- Arabe (`ar`)
+- Japonais (`ja`)
+- Chinois (`zh`)
+- Russe (`ru`)
+- Grec (`el`)
+- Thaï (`th`)
+- Coréen (`ko`)
+- Hindi (`hi`)
+- Vietnamien (`vi`)
+- Ukrainien (`uk`)
+
+### 1.2 Scripts Latins
+
+**Priorité:** Moyenne  
+**Technique:** Système scoring mots-clés
+| Langue | Code ISO | Mots-Clés | Bonus Détection |
+|--------|----------|-----------|------------------|
+| Français | `fr` | 47 | Contractions + Accents `àâçèéêëîïôùûü` |
+| Anglais | `en` | 58 | Aucun |
+| Espagnol | `es` | 47 | Accents `áéíóúñ¿¡` |
+| Allemand | `de` | 48 | Accents `äöüß` |
+| Italien | `it` | 43 | Accents `àèéìòù` |
+| Portugais | `pt` | 49 | Accents `ãõáéíóúâêôç` |
+| Néerlandais | `nl` | 44 | Aucun |
+
+**Paramètres de Détection:**
+
+- **Seuil Minimal:** 2 correspondances requises
+- **Raison:** Éviter faux positifs entre langues similaires
+- **Fallback:** Anglais (`en`) si score < 2
+
+## 2. Traduction Automatique
+
+**Fichier Source:** `src/app/api/chat/route.ts`
+
+**Processus d'Intégration:**
+
+**Étape 1 - Détection** (ligne 279)
+```typescript
+const detectedLang = detectLanguage(lastUserMessage);
+```
+
+**Étape 2 - Injection Système** (ligne 322)
 ```typescript
 content: `RESPOND ENTIRELY IN ${languageName.toUpperCase()}. Do not translate; always use ${languageName} for your entire response.`
 ```
 
-**Langues supportées:** 20+ langues avec noms complets
-- Européennes: English, French, Spanish, German, Italian, Portuguese, Dutch, Polish, Swedish, Norwegian, Danish, Finnish, Czech, Hungarian, Romanian, Greek, Turkish, Ukrainian
-- Asiatiques: Russian, Arabic, Hindi, Japanese, Chinese, Korean, Thai, Vietnamese, Indonesian
+**Langues Supportées:** 20+ avec résolution nom complet
 
-**Mécanisme:**
-1. Détection langue du message utilisateur
-2. Résolution ISO → nom complet (ex: 'fr' → 'French')
-3. Injection directive système AVANT tous les messages
-4. L'AI répond automatiquement dans la langue détectée
+**Groupe Européen:**
+- English, French, Spanish, German, Italian
+- Portuguese, Dutch, Polish, Swedish, Norwegian
+- Danish, Finnish, Czech, Hungarian, Romanian
+- Greek, Turkish, Ukrainian
+
+**Groupe Asiatique:**
+- Russian, Arabic, Hindi, Japanese, Chinese
+- Korean, Thai, Vietnamese, Indonesian
+
+**Flux d'Exécution:**
+
+1. **Analyse Message:** Détection langue via `detectLanguage()`
+2. **Résolution Code:** Conversion ISO vers nom complet  
+   *Exemple:* `fr` → `French`
+3. **Injection Directive:** Ajout message système en tête
+4. **Génération Réponse:** IA produit contenu dans langue cible
 
 ### 3. Obfuscation des intentions utilisateur
 
