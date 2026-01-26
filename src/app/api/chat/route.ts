@@ -242,6 +242,59 @@ function obfuscateIntent(text: string): string {
   }, text);
 }
 
+/**
+ * Validates if response is in the expected language.
+ * Detects dominant language in response text.
+ */
+function validateResponseLanguage(response: string, expectedLanguageCode: string): { isValid: boolean; detectedCode: string } {
+  if (!response || response.length < 10) {
+    return { isValid: true, detectedCode: expectedLanguageCode }; // Too short to validate
+  }
+
+  const detectedCode = detectLanguage(response);
+
+  // Check if detected language matches expected language
+  const isValid = detectedCode === expectedLanguageCode;
+
+  return { isValid, detectedCode };
+}
+
+/**
+ * Forces translation of response to target language using OpenAI.
+ * Used as fallback when AI responds in wrong language.
+ */
+async function forceTranslateResponse(
+  response: string,
+  targetLanguageCode: string,
+  targetLanguageName: string,
+  openai: OpenAI
+): Promise<string> {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a translation expert. Translate the following text EXACTLY to ${targetLanguageName}. Keep the exact same tone, formatting, and meaning. Do not add or remove any content. Respond ONLY with the translated text, nothing else.`,
+        },
+        {
+          role: "user",
+          content: response,
+        },
+      ],
+      temperature: 0.3,
+    });
+
+    const translatedContent = completion.choices?.[0]?.message?.content ?? response;
+    console.log(`[LanguageValidation] Response re-translated from detected language to ${targetLanguageName}`);
+    return translatedContent;
+  } catch (error) {
+    console.error(`[LanguageValidation] Translation failed:`, error);
+    // Return original if translation fails
+    return response;
+  }
+}
+
 export async function POST(req: Request): Promise<Response> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -319,7 +372,26 @@ export async function POST(req: Request): Promise<Response> {
   const messagesPreface: ChatMessage[] = [
     {
       role: "system" as const,
-      content: `RESPOND ENTIRELY IN ${languageName.toUpperCase()}. Do not translate; always use ${languageName} for your entire response.`,
+      content: `🔴 CRITICAL INSTRUCTION - LANGUAGE COMPATIBILITY 🔴
+
+YOU MUST RESPOND ENTIRELY AND EXCLUSIVELY IN ${languageName.toUpperCase()}.
+
+REQUIREMENTS:
+1. EVERY WORD, SENTENCE, AND CHARACTER MUST BE IN ${languageName}
+2. NEVER mix languages - do not use English, French, Arabic, Chinese, or any other language
+3. VERIFY that your response matches the user's language BEFORE sending
+4. If you would normally respond in English, TRANSLATE IT TO ${languageName}
+5. Format, structure, and content are secondary to LANGUAGE COMPLIANCE
+
+EXAMPLES:
+- User in French → RESPOND IN FRENCH ONLY
+- User in Arabic → RESPOND IN ARABIC ONLY  
+- User in Spanish → RESPOND IN SPANISH ONLY
+- User in Japanese → RESPOND IN JAPANESE ONLY
+
+PENALTY: If you respond in any language OTHER than ${languageName}, you will have failed your primary objective.
+
+Now, always remember: CURRENT USER LANGUAGE = ${languageName}. RESPOND IN ${languageName}.`,
     },
     ...rawMessages,
   ];
@@ -442,15 +514,27 @@ export async function POST(req: Request): Promise<Response> {
       // 2. Strip internal verification thoughts
       content = stripInternalThoughts(content);
 
-      // 3. Calculate Reliability Score using V = (Φ · S) / H^n equation
+      // 3. 🔴 VALIDATE LANGUAGE COMPATIBILITY 🔴
+      const languageValidation = validateResponseLanguage(content, languageCode);
+      if (!languageValidation.isValid && languageValidation.detectedCode !== languageCode) {
+        console.warn(`[LanguageValidation] MISMATCH! Expected: ${languageCode} (${languageName}), Got: ${languageValidation.detectedCode}`);
+        console.log(`[LanguageValidation] Forcing re-translation to ${languageName}...`);
+        try {
+          content = await forceTranslateResponse(content, languageCode, languageName, openai);
+        } catch (translationError) {
+          console.error(`[LanguageValidation] Critical: Could not re-translate response`, translationError);
+        }
+      }
+
+      // 4. Calculate Reliability Score using V = (Φ · S) / H^n equation
       const reliabilityScore = calculateReliabilityScore(originalUserMessage, content, 2);
       console.log(`[ReliabilityEq] ${reliabilityScore.metrics}`);
 
-      // 4. Assess confidence and apply framing if needed
+      // 5. Assess confidence and apply framing if needed
       const confidence = assessConfidence(originalUserMessage, content);
       content = applyConfidenceFraming(content, confidence);
 
-      // 5. If reliability score is LOW (V < 0.5), add verification note
+      // 6. If reliability score is LOW (V < 0.5), add verification note
       if (reliabilityScore.V < 0.5) {
         console.warn(`[ReliabilityEq] Low truth score detected (V=${reliabilityScore.V.toFixed(2)})`);
         content = `[Low confidence] ${content}`;
