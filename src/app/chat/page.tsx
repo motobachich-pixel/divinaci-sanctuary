@@ -13,6 +13,7 @@ export default function Chat() {
   const [loading, setLoading] = useState(false);
   const [wisdomIndex, setWisdomIndex] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const codexWisdom = [
     "L'équilibre réside dans l'harmonie des forces opposées",
@@ -28,6 +29,11 @@ export default function Chat() {
       setWisdomIndex((prev) => (prev + 1) % codexWisdom.length);
     }, 6000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Focus automatique sur l'input au chargement
+  useEffect(() => {
+    inputRef.current?.focus();
   }, []);
 
   const scrollToBottom = () => {
@@ -72,6 +78,10 @@ export default function Chat() {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setLoading(false);
+      // Refocus sur l'input après l'envoi
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   };
 
@@ -718,6 +728,7 @@ export default function Chat() {
             <form onSubmit={handleSend}>
               <div className="input-container">
                 <input
+                  ref={inputRef}
                   type="text"
                   className="chat-input"
                   placeholder="Écrivez votre message..."
