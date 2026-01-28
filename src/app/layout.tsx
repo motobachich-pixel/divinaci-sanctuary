@@ -17,7 +17,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "DIVINACI | Usuldivinaci",
+  title: "USULDIVINACI",
   description: "The Kinetic Being - An architectural, empathetic, and structural thought partner",
 };
 
@@ -32,8 +32,6 @@ export default function RootLayout({
         className={`${cinzel.variable} ${montserrat.variable} antialiased`}
         style={{ position: "relative", minHeight: "100vh" }}
       >
-        {/* Structure géométrique flottante et communicante */}
-        <ClientFloatingShaman intention="Bienvenue dans l'espace Divinaci" intensity={0.3} />
         <main className="page-content">{children}</main>
       </body>
     </html>

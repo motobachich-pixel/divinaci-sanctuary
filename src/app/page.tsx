@@ -432,7 +432,7 @@ export default function Home() {
         width: "100%",
         padding: "2.5rem 1.5rem 2.5rem 1.5rem"
       }}>
-        <h1 className="hero-title" style={{marginBottom: "0.5rem"}}>DIVINACI</h1>
+        <h1 className="hero-title" style={{marginBottom: "0.5rem"}}>USULDIVINACI</h1>
         <p className="hero-subtitle" style={{marginBottom: "1.2rem"}}>Votre compagnon de sagesse céleste et de réflexion profonde</p>
         <div className="wisdom-rotating" key={currentWisdom} style={{marginBottom: "1.5rem"}}>
           {celestialWisdom[currentWisdom]}
