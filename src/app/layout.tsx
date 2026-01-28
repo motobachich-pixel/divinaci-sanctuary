@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Cinzel, Montserrat } from "next/font/google";
 import "./globals.css";
-import Sidebar from "../components/Sidebar";
+
+import dynamic from "next/dynamic";
+const ShamanGuide = dynamic(() => import("../components/ShamanGuide"), { ssr: false });
 
 const cinzel = Cinzel({
   variable: "--font-cinzel",
@@ -28,7 +30,12 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${cinzel.variable} ${montserrat.variable} antialiased`}
+        style={{ position: "relative", minHeight: "100vh" }}
       >
+        {/* Merlin chamanique flottant sur toutes les pages */}
+        <div style={{ position: "fixed", right: 32, bottom: 32, zIndex: 30, pointerEvents: "none" }}>
+          <ShamanGuide />
+        </div>
         <main className="page-content">{children}</main>
       </body>
     </html>

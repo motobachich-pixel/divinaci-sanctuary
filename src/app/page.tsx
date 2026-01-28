@@ -438,7 +438,7 @@ export default function Home() {
           {celestialWisdom[currentWisdom]}
         </div>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "2.5rem" }}>
-          <Link href="/chat" className="action-card" style={{ minWidth: 260, maxWidth: 340, width: "100%", fontSize: "1.1rem" }}>
+          <Link href="/chat" className="action-card" style={{ minWidth: 260, maxWidth: 340, width: "100%", fontSize: "1.1rem", padding: "0.7rem 1rem" }}>
             <span className="action-icon" style={{ fontSize: "2.2rem" }}>{mainAction.icon}</span>
             <span className="action-title">{mainAction.label}</span>
             <span className="action-desc">{mainAction.desc}</span>
