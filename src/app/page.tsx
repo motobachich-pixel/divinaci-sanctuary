@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const ShamanGuide = dynamic(() => import("../components/ShamanGuide"), { ssr: false });
 
 const celestialWisdom = [
   "L'équilibre réside dans l'harmonie cosmique",
@@ -11,12 +14,7 @@ const celestialWisdom = [
   "Chaque atome porte l'essence du cosmos",
 ];
 
-const quickThemes = [
-  { icon: "✦", label: "Oracle Cosmique", desc: "Posez vos grandes questions" },
-  { icon: "☉", label: "Rituel Céleste", desc: "Explorez les pratiques sacrées" },
-  { icon: "⚡", label: "Énergie", desc: "Conversation énergétique" },
-  { icon: "◈", label: "Sagesse Ancienne", desc: "Transmissions spirituelles" },
-];
+const mainAction = { icon: "✦", label: "Commencer le voyage céleste", desc: "Entrez dans l'espace sacré du dialogue" };
 
 export default function Home() {
   const [currentWisdom, setCurrentWisdom] = useState(0);
@@ -439,14 +437,17 @@ export default function Home() {
         <div className="wisdom-rotating" key={currentWisdom} style={{marginBottom: "1.5rem"}}>
           {celestialWisdom[currentWisdom]}
         </div>
-        <div className="quick-actions" style={{marginBottom: "1.5rem"}}>
-          {quickThemes.map((theme, idx) => (
-            <Link key={idx} href="/chat" className="action-card">
-              <span className="action-icon">{theme.icon}</span>
-              <span className="action-title">{theme.label}</span>
-              <span className="action-desc">{theme.desc}</span>
-            </Link>
-          ))}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "2.5rem" }}>
+          <Link href="/chat" className="action-card" style={{ minWidth: 260, maxWidth: 340, width: "100%", fontSize: "1.1rem" }}>
+            <span className="action-icon" style={{ fontSize: "2.2rem" }}>{mainAction.icon}</span>
+            <span className="action-title">{mainAction.label}</span>
+            <span className="action-desc">{mainAction.desc}</span>
+          </Link>
+        </div>
+
+        {/* Personnage chamanique dynamique */}
+        <div id="shamanic-guide" style={{ display: "flex", justifyContent: "center", margin: "2.5rem 0 1.5rem 0", minHeight: 220 }}>
+          <ShamanGuide />
         </div>
         <div className="footer-wisdom">
           Alignement · Dynamisme · Intention · Luminosité
