@@ -5,7 +5,7 @@ const ShamanGuide = dynamic(() => import("./ShamanGuide"), { ssr: false });
 import { useEffect, useRef, useState } from "react";
 
 // Props: intention (string), intensity (0-1)
-export default function ClientFloatingShaman({ intention = "Bienvenue dans l'espace Divinaci", intensity = 0.3 }) {
+export default function ClientFloatingShaman({ intention = "Bienvenue dans l'espace Usuldivinaci", intensity = 0.3 }) {
   // Mouvement flottant
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const tRef = useRef(0);

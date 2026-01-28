@@ -11,7 +11,7 @@ const celestialWisdom = [
   "La connaissance illumine l'infini",
   "Dans le silence réside la sagesse universelle",
   "L'énergie circule entre les étoiles",
-  "Chaque atome porte l'essence du cosmos",
+  "Chaque atome porte l'essence d'USULDIVINACI",
 ];
 
 const mainAction = { icon: "✦", label: "Commencer le voyage céleste", desc: "Entrez dans l'espace sacré du dialogue" };
@@ -75,7 +75,7 @@ export default function Home() {
     };
   }, []);
 
-  // Géométrie vivante DIVINACI
+  // Géométrie vivante USULDIVINACI
   useEffect(() => {
     const canvas = geometryCanvasRef.current;
     if (!canvas) return;
