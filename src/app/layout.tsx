@@ -29,10 +29,7 @@ export default function RootLayout({
       <body
         className={`${cinzel.variable} ${montserrat.variable} antialiased`}
       >
-        <div className="app-shell">
-          <Sidebar />
-          <main className="page-content">{children}</main>
-        </div>
+        <main className="page-content">{children}</main>
       </body>
     </html>
   );

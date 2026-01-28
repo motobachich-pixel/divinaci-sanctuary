@@ -1,116 +1,35 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
-// Sagesse du Codex Boutayeb
-const codexWisdom = [
-  "L'équilibre réside dans l'harmonie des forces opposées",
-  "La connaissance illumine le chemin de la conscience",
-  "Dans le silence réside la vérité universelle",
-  "L'énergie circule où l'intention se concentre",
-  "La sagesse naît de l'observation profonde",
-  "Chaque forme contient l'essence de l'univers",
-  "Le temps est une illusion, la conscience est éternelle",
-  "L'unité se manifeste dans la diversité",
+const celestialWisdom = [
+  "L'équilibre réside dans l'harmonie cosmique",
+  "La connaissance illumine l'infini",
+  "Dans le silence réside la sagesse universelle",
+  "L'énergie circule entre les étoiles",
+  "Chaque atome porte l'essence du cosmos",
 ];
 
-// Sagesses dédiées aux piliers ADIL, dérivées de l'esprit des aphorismes
-const adilPillars = [
-  "Alignement : l'harmonie des forces opposées",
-  "Dynamisme : l'énergie circule où l'intention se pose",
-  "Intention : chaque forme porte l'essence",
-  "Luminosité : la connaissance illumine le chemin",
-  "Alignement · Dynamisme · Intention · Luminosité",
-  "Intention · Luminosité · Alignement · Dynamisme",
+const quickThemes = [
+  { icon: "✦", label: "Oracle Cosmique", desc: "Posez vos grandes questions" },
+  { icon: "☉", label: "Rituel Céleste", desc: "Explorez les pratiques sacrées" },
+  { icon: "⚡", label: "Énergie", desc: "Conversation énergétique" },
+  { icon: "◈", label: "Sagesse Ancienne", desc: "Transmissions spirituelles" },
 ];
-
-const languageNotes: Record<string, { code: string; note: string }> = {
-  fr: {
-    code: "Français",
-    note: "Nous ajustons la conversation pour répondre en français automatiquement.",
-  },
-  en: {
-    code: "English",
-    note: "We will answer in English by default; change anytime in the chat.",
-  },
-  es: {
-    code: "Español",
-    note: "Responderemos en español para más comodidad en la conversation.",
-  },
-  ar: {
-    code: "العربية",
-    note: "سيتم الرد عليك بالعربية مع تنسيق مريح للعينين.",
-  },
-  de: {
-    code: "Deutsch",
-    note: "Antworten erfolgen auf Deutsch; tu peux basculer dans le chat à tout moment.",
-  },
-  it: {
-    code: "Italiano",
-    note: "Risponderemo in italiano; puoi cambiare lingua nel chat en un clic.",
-  },
-  pt: {
-    code: "Português",
-    note: "Responderemos em português; mude a qualquer momento no chat.",
-  },
-};
 
 export default function Home() {
   const [currentWisdom, setCurrentWisdom] = useState(0);
-  const [adilVariant, setAdilVariant] = useState(0);
-  const [userLanguageCode, setUserLanguageCode] = useState("en");
-  const [userLanguageName, setUserLanguageName] = useState("English");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const geometryCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Détecte la langue du navigateur pour informer l'utilisateur
-  useEffect(() => {
-    const browserLang = (typeof navigator !== "undefined" ? navigator.language : "en") || "en";
-    const code = browserLang.slice(0, 2).toLowerCase();
-    const names: Record<string, string> = {
-      en: "English",
-      fr: "Français",
-      es: "Español",
-      de: "Deutsch",
-      it: "Italiano",
-      pt: "Português",
-      nl: "Nederlands",
-      ar: "العربية",
-      zh: "中文",
-      ja: "日本語",
-      ko: "한국어",
-      ru: "Русский",
-      hi: "हिन्दी",
-      tr: "Türkçe",
-    };
-    setUserLanguageCode(code);
-    setUserLanguageName(languageNotes[code]?.code || names[code] || "English");
-  }, []);
-
-  // Rotation de la sagesse toutes les 8 secondes
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentWisdom((prev) => (prev + 1) % codexWisdom.length);
-    }, 8000);
+      setCurrentWisdom((prev) => (prev + 1) % celestialWisdom.length);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
 
-  // Variation aléatoire des piliers ADIL toutes les 7 secondes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAdilVariant((prev) => {
-        if (adilPillars.length <= 1) return prev;
-        let next = prev;
-        while (next === prev) {
-          next = Math.floor(Math.random() * adilPillars.length);
-        }
-        return next;
-      });
-    }, 7000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Particules dorées en arrière-plan
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -123,37 +42,30 @@ export default function Home() {
     };
     resize();
 
-    const particles: Array<{ x: number; y: number; vx: number; vy: number; opacity: number }> = [];
-    const particleCount = 48;
-
-    // Initialiser des particules
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        vx: (Math.random() - 0.5) * 0.22,
-        vy: (Math.random() - 0.5) * 0.22,
-        opacity: Math.random() * 0.4 + 0.2,
+    const stars: Array<{ x: number; y: number; radius: number; opacity: number }> = [];
+    for (let i = 0; i < 100; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.2,
+        opacity: Math.random() * 0.6 + 0.2,
       });
     }
 
+    let time = 0;
     let rafId = 0;
+
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        
-        if (p.x < 0 || p.x > window.innerWidth) p.vx *= -1;
-        if (p.y < 0 || p.y > window.innerHeight) p.vy *= -1;
-        
-        ctx.fillStyle = `rgba(197, 160, 89, ${p.opacity})`;
+      time += 0.01;
+
+      stars.forEach((star) => {
+        ctx.fillStyle = `rgba(197, 160, 89, ${star.opacity + Math.sin(time + star.x) * 0.3})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fill();
       });
-      
+
       rafId = requestAnimationFrame(animate);
     };
     rafId = requestAnimationFrame(animate);
@@ -165,385 +77,380 @@ export default function Home() {
     };
   }, []);
 
-  // Formes géométriques basées sur l'Équation ADIL
+  // Géométrie vivante DIVINACI
   useEffect(() => {
     const canvas = geometryCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 
+    let animationId: number;
     let time = 0;
-    let rafId = 0;
 
-    // Équation ADIL: A·D·I·L = Harmonie
-    // A = Alignement, D = Dynamisme, I = Intention, L = Luminosité
-    const drawADILGeometry = () => {
+    const animate = () => {
+      time += 0.005;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      
-      time += 0.008;
-      
-      // Loi ADIL 1: Spirale d'Alignement
-      const spiralPoints = 120;
-      ctx.strokeStyle = `rgba(197, 160, 89, 0.18)`;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      for (let i = 0; i < spiralPoints; i++) {
-        const angle = (i / spiralPoints) * Math.PI * 8 + time;
-        const radius = 100 + i * 2 + Math.sin(time * 2) * 20;
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
+      const maxRadius = Math.min(canvas.width, canvas.height) / 2 - 20;
 
-      // Loi ADIL 2: Hexagone du Dynamisme
-      const hexRadius = 150 + Math.sin(time) * 30;
-      ctx.strokeStyle = `rgba(197, 160, 89, 0.22)`;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const angle = (i / 6) * Math.PI * 2 + time * 0.5;
-        const x = centerX + Math.cos(angle) * hexRadius;
-        const y = centerY + Math.sin(angle) * hexRadius;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.stroke();
+      // Orbites rotatoires
+      for (let orbit = 1; orbit <= 3; orbit++) {
+        const radius = (maxRadius / 3) * orbit;
+        const pointCount = orbit * 4;
 
-      // Loi ADIL 3: Cercles d'Intention concentriques
-      for (let i = 1; i <= 4; i++) {
-        const radius = 80 * i + Math.sin(time + i) * 15;
-        ctx.strokeStyle = `rgba(197, 160, 89, ${0.12 - i * 0.02})`;
+        ctx.strokeStyle = `rgba(197, 160, 89, ${0.3 - orbit * 0.08})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         ctx.stroke();
+
+        // Points animés sur orbite
+        for (let i = 0; i < pointCount; i++) {
+          const angle = (i / pointCount) * Math.PI * 2 + time * (0.3 - orbit * 0.08);
+          const x = centerX + Math.cos(angle) * radius;
+          const y = centerY + Math.sin(angle) * radius;
+
+          const size = 2 + Math.sin(time * 2 + i) * 1.5;
+          ctx.fillStyle = `rgba(197, 160, 89, ${0.6 + Math.sin(time + i) * 0.4})`;
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
-      // Loi ADIL 4: Étoile de Luminosité à 8 branches
-      const starRadius = 200 + Math.cos(time * 1.5) * 40;
-      ctx.strokeStyle = `rgba(197, 160, 89, 0.16)`;
+      // Spirale centrale
+      ctx.strokeStyle = `rgba(197, 160, 89, 0.4)`;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      for (let i = 0; i < 8; i++) {
-        const angle = (i / 8) * Math.PI * 2 - Math.PI / 2 + time * 0.3;
-        const outerRadius = starRadius;
-        const innerRadius = starRadius * 0.5;
-        
-        const x1 = centerX + Math.cos(angle) * outerRadius;
-        const y1 = centerY + Math.sin(angle) * outerRadius;
-        const x2 = centerX + Math.cos(angle + Math.PI / 8) * innerRadius;
-        const y2 = centerY + Math.sin(angle + Math.PI / 8) * innerRadius;
-        
-        if (i === 0) ctx.moveTo(x1, y1);
-        else ctx.lineTo(x1, y1);
-        ctx.lineTo(x2, y2);
+      for (let i = 0; i < Math.PI * 6; i += 0.05) {
+        const r = (i / (Math.PI * 6)) * (maxRadius * 0.4) + Math.sin(time * 2) * 5;
+        const angle = i + time * 0.2;
+        const x = centerX + Math.cos(angle) * r;
+        const y = centerY + Math.sin(angle) * r;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       }
-      ctx.closePath();
       ctx.stroke();
 
-      // Orbe central lumineux (point de convergence ADIL)
-      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 60);
-      gradient.addColorStop(0, 'rgba(232, 213, 163, 0.72)');
-      gradient.addColorStop(0.5, 'rgba(197, 160, 89, 0.32)');
-      gradient.addColorStop(1, 'rgba(139, 111, 71, 0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 60, 0, Math.PI * 2);
-      ctx.fill();
-      
-      rafId = requestAnimationFrame(drawADILGeometry);
-    };
-    
-    rafId = requestAnimationFrame(drawADILGeometry);
+      // Cristaux/diamants
+      const crystalCount = 8;
+      for (let i = 0; i < crystalCount; i++) {
+        const angle = (i / crystalCount) * Math.PI * 2 + time * 0.15;
+        const distance = maxRadius * 0.7;
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
 
-    window.addEventListener("resize", resize);
-    return () => {
-      window.removeEventListener("resize", resize);
-      if (rafId) cancelAnimationFrame(rafId);
+        const size = 8 + Math.sin(time * 1.5 + i) * 3;
+        ctx.fillStyle = `rgba(197, 160, 89, ${0.7 + Math.sin(time + i * 0.5) * 0.3})`;
+        
+        // Dessiner un diamant
+        ctx.beginPath();
+        ctx.moveTo(x, y - size);
+        ctx.lineTo(x + size, y);
+        ctx.lineTo(x, y + size);
+        ctx.lineTo(x - size, y);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = `rgba(197, 160, 89, 0.5)`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      animationId = requestAnimationFrame(animate);
     };
+
+    animate();
+    return () => cancelAnimationFrame(animationId);
   }, []);
 
-  const handleClick = () => {
-    const langParam = userLanguageCode ? `?lang=${encodeURIComponent(userLanguageCode)}` : "";
-    window.location.href = `/chat${langParam}`;
-  };
-
   return (
-    <div>
+    <div className="home-container">
       <style>{`
-        :root {
-          --center-offset: calc(var(--sidebar-active-width, 260px) / 2);
-        }
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        body, html {
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-        }
-        .void {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(ellipse at center, #0a0808 0%, #030202 100%);
-          z-index: -10;
-        }
-        .canvas {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 1;
-          pointer-events: none;
-        }
-        .geometry-canvas {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 2;
-          pointer-events: none;
-        }
-        .brand-mark {
-          position: fixed;
-          inset: 0;
-          display: grid;
-          place-items: center;
-          pointer-events: none;
-          z-index: 6;
-          translate: calc(var(--center-offset)) 0;
-        }
-        .brand-ring {
-          width: clamp(160px, 18vmin, 220px);
-          height: clamp(160px, 18vmin, 220px);
-          border-radius: 999px;
-          border: 1.5px solid rgba(197, 160, 89, 0.22);
-          box-shadow: 0 0 40px rgba(197, 160, 89, 0.12), inset 0 0 30px rgba(197, 160, 89, 0.08);
-          backdrop-filter: blur(6px);
+        .home-container {
           position: relative;
-          opacity: 0.8;
-          animation: slowPulse 6s ease-in-out infinite;
+          width: 100%;
+          min-height: 100vh;
+          background: linear-gradient(180deg, #0a0907 0%, #07050a 50%, #050307 100%);
+          overflow-y: auto;
         }
-        .brand-ring::after {
-          content: "";
-          position: absolute;
-          inset: 12%;
-          border-radius: inherit;
-          border: 1px solid rgba(197, 160, 89, 0.16);
-        }
-        .brand-core {
-          position: relative;
-          width: clamp(32px, 5vmin, 48px);
-          height: clamp(32px, 5vmin, 48px);
-          background: radial-gradient(circle, rgba(232, 213, 163, 0.9), rgba(197, 160, 89, 0.55));
-          border-radius: 12px;
-          box-shadow: 0 0 30px rgba(197, 160, 89, 0.4), 0 0 80px rgba(197, 160, 89, 0.2);
-          transform: rotate(15deg);
-          opacity: 0.9;
-        }
-        @keyframes slowPulse {
-          0% { transform: scale(0.98); opacity: 0.7; }
-          50% { transform: scale(1.02); opacity: 0.9; }
-          100% { transform: scale(0.98); opacity: 0.7; }
-        }
-        .wisdom-bar {
+
+        .cosmic-bg {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
-          height: 56px;
-          background: linear-gradient(180deg, rgba(15, 12, 8, 0.78) 0%, rgba(10, 8, 5, 0.64) 100%);
-          backdrop-filter: blur(14px);
-          border-bottom: 1px solid rgba(197, 160, 89, 0.12);
+          height: 100vh;
+          background: radial-gradient(circle at 20% 50%, rgba(197, 160, 89, 0.08) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(109, 119, 196, 0.06) 0%, transparent 50%);
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .stars-canvas {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          height: 100vh;
+          z-index: 1;
+          pointer-events: none;
+        }
+
+        .hero-section {
+          position: relative;
+          z-index: 10;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 0 1.8rem 0 calc(var(--sidebar-active-width, 260px) + 24px);
-          transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          z-index: 50;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-        }
-        .wisdom-bar::before {
-          content: '';
-          position: absolute;
-          bottom: -1px;
-          left: 20%;
-          right: 20%;
-          height: 1px;
-          background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(197, 160, 89, 0.4) 50%,
-            transparent 100%);
-        }
-        .wisdom-text {
-          font-family: var(--font-cinzel);
-          font-size: clamp(0.85rem, 1.4vw, 1.05rem);
-          font-weight: 100;
-          letter-spacing: 0.12em;
-          color: #C5A059;
+          min-height: 100vh;
+          padding: 2.5rem 1.5rem;
           text-align: center;
-          text-shadow: 0 0 10px rgba(197, 160, 89, 0.22);
-          animation: fadeIn 1s ease-in-out;
+          gap: 1.5rem;
         }
-        @keyframes fadeIn {
+
+        .hero-title {
+          font-family: var(--font-cinzel);
+          font-size: clamp(2.2rem, 8vw, 4.5rem);
+          font-weight: 100;
+          letter-spacing: 0.2em;
+          color: #C5A059;
+          text-shadow: 0 0 50px rgba(197, 160, 89, 0.5);
+          margin: 0;
+          animation: titleFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes titleFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
+        }
+
+        .hero-subtitle {
+          font-family: var(--font-montserrat);
+          font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+          color: rgba(197, 160, 89, 0.75);
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          margin: 0;
+          max-width: 600px;
+          line-height: 1.6;
+        }
+
+        .wisdom-rotating {
+          min-height: 1.8rem;
+          margin: 1rem 0;
+          font-family: var(--font-cinzel);
+          font-size: 0.9rem;
+          font-weight: 100;
+          letter-spacing: 0.1em;
+          color: rgba(197, 160, 89, 0.8);
+          text-shadow: 0 0 20px rgba(197, 160, 89, 0.3);
+          animation: fadeInText 1s ease-in;
+        }
+
+        @keyframes fadeInText {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-        .sanctuary-title {
-          position: fixed;
-          top: 45%;
-          left: calc(50% + var(--center-offset));
-          transform: translate(-50%, -50%);
-          z-index: 10;
+
+        .geometry-canvas {
+          width: 100%;
+          max-width: 900px;
+          height: 300px;
+          margin: 2rem auto;
+          border-radius: 16px;
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.05), rgba(109, 119, 196, 0.05));
+          border: 1px solid rgba(197, 160, 89, 0.15);
+          display: block;
+        }
+
+        .quick-actions {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1rem;
+          max-width: 1000px;
+          width: 100%;
+          margin: 1.5rem auto;
+          padding: 0 0.5rem;
+        }
+
+        .action-card {
+          padding: 1.3rem 1rem;
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.1), rgba(197, 160, 89, 0.03));
+          border: 1px solid rgba(197, 160, 89, 0.25);
+          border-radius: 14px;
+          cursor: pointer;
+          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          text-decoration: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.7rem;
           text-align: center;
         }
-        .title-main {
+
+        .action-card:hover {
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.18), rgba(197, 160, 89, 0.08));
+          border-color: rgba(197, 160, 89, 0.45);
+          box-shadow: 0 8px 24px rgba(197, 160, 89, 0.2);
+          transform: translateY(-8px);
+        }
+
+        .action-icon {
+          font-size: 2.2rem;
+          filter: drop-shadow(0 0 12px rgba(197, 160, 89, 0.3));
+        }
+
+        .action-title {
           font-family: var(--font-cinzel);
-          font-size: clamp(2.5rem, 8vmin, 5rem);
+          font-size: 0.95rem;
           font-weight: 100;
-          letter-spacing: clamp(0.4em, 3vw, 1em);
+          letter-spacing: 0.08em;
           color: #C5A059;
-          text-shadow: 
-            0 0 18px rgba(197, 160, 89, 0.42),
-            0 0 34px rgba(197, 160, 89, 0.26),
-            0 0 50px rgba(197, 160, 89, 0.18);
-          animation: titleGlow 4s ease-in-out infinite alternate;
+          margin: 0;
         }
-        @keyframes titleGlow {
-          0% { 
-            text-shadow: 
-              0 0 20px rgba(197, 160, 89, 0.5),
-              0 0 40px rgba(197, 160, 89, 0.3),
-              0 0 60px rgba(197, 160, 89, 0.2);
-          }
-          100% { 
-            text-shadow: 
-              0 0 30px rgba(197, 160, 89, 0.7),
-              0 0 60px rgba(197, 160, 89, 0.5),
-              0 0 90px rgba(197, 160, 89, 0.3);
-          }
+
+        .action-desc {
+          font-family: var(--font-montserrat);
+          font-size: 0.75rem;
+          color: rgba(197, 160, 89, 0.65);
+          font-weight: 300;
+          margin: 0;
+          line-height: 1.3;
         }
-        .title-subtitle {
-          font-family: var(--font-cinzel);
-          font-size: clamp(0.85rem, 2.2vmin, 1.3rem);
-          font-weight: 100;
-          letter-spacing: 0.3em;
-          color: rgba(197, 160, 89, 0.7);
-          margin-top: 1rem;
-          text-transform: uppercase;
-        }
-        .enter-portal {
-          position: fixed;
-          bottom: 120px;
-          left: calc(50% + var(--center-offset));
-          transform: translateX(-50%);
-          padding: 1rem 2.6rem;
-          background: linear-gradient(135deg, rgba(197, 160, 89, 0.12), rgba(197, 160, 89, 0.06));
-          border: 1.5px solid rgba(197, 160, 89, 0.28);
+
+        .cta-button {
+          padding: 1rem 2.8rem;
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(197, 160, 89, 0.08));
+          border: 1.5px solid rgba(197, 160, 89, 0.4);
           border-radius: 50px;
           color: #C5A059;
           font-family: var(--font-cinzel);
-          font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+          font-size: clamp(0.9rem, 1.4vw, 1.05rem);
           font-weight: 100;
-          letter-spacing: 0.16em;
+          letter-spacing: 0.12em;
           cursor: pointer;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          z-index: 10;
+          transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
           text-decoration: none;
           display: inline-block;
-          box-shadow: 0 0 18px rgba(197, 160, 89, 0.24);
-        }
-        .enter-portal:hover {
-          background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(197, 160, 89, 0.12));
-          border-color: #C5A059;
-          box-shadow: 0 0 26px rgba(197, 160, 89, 0.34);
-          transform: translateX(-50%) translateY(-3px);
-        }
-        .adil-label {
-          position: fixed;
-          bottom: 40px;
-          left: calc(50% + var(--center-offset));
-          transform: translateX(-50%);
-          font-family: var(--font-cinzel);
-          font-size: 0.75rem;
-          letter-spacing: 0.15em;
-          color: rgba(197, 160, 89, 0.65);
+          box-shadow: 0 0 30px rgba(197, 160, 89, 0.25);
           text-transform: uppercase;
-          z-index: 10;
-          padding: 0.38rem 1.3rem;
-          background: rgba(5, 5, 5, 0.22);
-          border: 1px solid rgba(197, 160, 89, 0.18);
-          border-radius: 999px;
-          backdrop-filter: blur(4px);
-          text-shadow: 0 0 6px rgba(197, 160, 89, 0.28);
-          animation: fadeIn 0.9s ease-in-out;
+          margin-top: 1.5rem;
         }
 
-        @keyframes pulseShimmer {
-          0% { box-shadow: 0 0 20px rgba(197,160,89,0.12); }
-          50% { box-shadow: 0 0 32px rgba(197,160,89,0.3); }
-          100% { box-shadow: 0 0 20px rgba(197,160,89,0.12); }
+        .cta-button:hover {
+          background: linear-gradient(135deg, rgba(197, 160, 89, 0.3), rgba(197, 160, 89, 0.15));
+          border-color: #C5A059;
+          box-shadow: 0 0 50px rgba(197, 160, 89, 0.4), 0 12px 24px rgba(197, 160, 89, 0.2);
+          transform: translateY(-5px);
         }
-        .enter-portal {
-          animation: pulseShimmer 3s ease-in-out infinite;
+
+        .footer-wisdom {
+          margin-top: 2rem;
+          padding-top: 2rem;
+          font-family: var(--font-montserrat);
+          font-size: 0.75rem;
+          color: rgba(197, 160, 89, 0.55);
+          letter-spacing: 0.08em;
+          text-align: center;
+          border-top: 1px solid rgba(197, 160, 89, 0.15);
+          max-width: 900px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        @media (max-width: 900px) {
+          .hero-section {
+            padding: 2rem 1.25rem;
+            gap: 1rem;
+          }
+          .hero-subtitle {
+            font-size: 0.9rem;
+            margin: 0;
+          }
+          .wisdom-rotating {
+            font-size: 0.85rem;
+            min-height: 1.6rem;
+            margin: 0.75rem 0;
+          }
+          .geometry-canvas {
+            height: 200px;
+            margin: 1.5rem auto;
+          }
+          .quick-actions {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.9rem;
+            margin: 1rem auto;
+            padding: 0 0.5rem;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .quick-actions {
+            grid-template-columns: 1fr;
+          }
         }
       `}</style>
 
-      {/* Fond du sanctuaire */}
-      <div className="void"></div>
+      <div className="cosmic-bg" />
+      <canvas ref={canvasRef} className="stars-canvas" />
 
-      {/* Canvas de particules */}
-      <canvas ref={canvasRef} className="canvas" />
+      {/* Fullscreen animated geometry background */}
+      <canvas
+        ref={geometryCanvasRef}
+        className="geometry-canvas background-canvas"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          minWidth: "100vw",
+          minHeight: "100vh",
+          maxWidth: "100vw",
+          maxHeight: "100vh",
+          zIndex: 0,
+          pointerEvents: "none",
+          objectFit: "cover",
+          background: "linear-gradient(135deg, rgba(10,9,7,0.98) 0%, rgba(7,5,10,0.98) 50%, rgba(5,3,7,0.98) 100%)"
+        }}
+      />
 
-      {/* Canvas des formes géométriques ADIL */}
-      <canvas ref={geometryCanvasRef} className="geometry-canvas" />
-
-      {/* Barre de sagesse du Codex Boutayeb */}
-      <div className="wisdom-bar">
-        <span className="wisdom-text" key={currentWisdom}>
-          {codexWisdom[currentWisdom]}
-        </span>
-      </div>
-
-      {/* Titre du sanctuaire */}
-      <div className="sanctuary-title">
-        <h1 className="title-main">USULDIVINACI</h1>
-        <p className="title-subtitle">Le Sanctuaire Éternel</p>
-      </div>
-
-      {/* Logo central inspiré de la géométrie */}
-      <div className="brand-mark" aria-hidden="true">
-        <div className="brand-ring" />
-        <div className="brand-core" />
-      </div>
-
-      {/* Bouton d'entrée */}
-      <button className="enter-portal" onClick={handleClick}>
-        ◈ Entrer dans l'Oracle ◈
-      </button>
-
-      {/* Label ADIL sans mention explicite */}
-      <div className="adil-label" key={adilVariant}>
-        {adilPillars[adilVariant]}
+      <div className="hero-section" style={{
+        position: "relative",
+        zIndex: 2,
+        background: "none",
+        boxShadow: "0 2px 32px 0 rgba(0,0,0,0.12)",
+        borderRadius: "18px",
+        margin: "2.5rem auto 0 auto",
+        maxWidth: "900px",
+        width: "100%",
+        padding: "2.5rem 1.5rem 2.5rem 1.5rem"
+      }}>
+        <h1 className="hero-title" style={{marginBottom: "0.5rem"}}>DIVINACI</h1>
+        <p className="hero-subtitle" style={{marginBottom: "1.2rem"}}>Votre compagnon de sagesse céleste et de réflexion profonde</p>
+        <div className="wisdom-rotating" key={currentWisdom} style={{marginBottom: "1.5rem"}}>
+          {celestialWisdom[currentWisdom]}
+        </div>
+        <div className="quick-actions" style={{marginBottom: "1.5rem"}}>
+          {quickThemes.map((theme, idx) => (
+            <Link key={idx} href="/chat" className="action-card">
+              <span className="action-icon">{theme.icon}</span>
+              <span className="action-title">{theme.label}</span>
+              <span className="action-desc">{theme.desc}</span>
+            </Link>
+          ))}
+        </div>
+        <div className="footer-wisdom">
+          Alignement · Dynamisme · Intention · Luminosité
+        </div>
       </div>
     </div>
   );

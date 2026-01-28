@@ -21,7 +21,8 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
@@ -130,9 +131,9 @@ body {
 }
 
 .brand-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
   background: radial-gradient(circle, rgba(232, 213, 163, 0.85), rgba(197, 160, 89, 0.3));
   display: grid;
   place-items: center;
@@ -176,8 +177,8 @@ body {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 10px;
+  padding: 9px 10px;
   border-radius: 12px;
   color: #e9e0c9;
   text-decoration: none;
@@ -212,9 +213,9 @@ body {
 }
 
 .item-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
   border: 1px solid rgba(197, 160, 89, 0.2);
   display: grid;
   place-items: center;
@@ -301,7 +302,7 @@ body {
 .sidebar-shell.is-collapsed .sidebar-item {
   grid-template-columns: 1fr;
   justify-items: center;
-  padding: 10px;
+  padding: 8px;
 }
 
 .sidebar-shell.is-collapsed .sidebar-nav {
@@ -309,10 +310,8 @@ body {
 }
 
 .page-content {
-  margin-left: var(--sidebar-active-width, 260px);
-  transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   min-height: 100vh;
-  width: calc(100% - var(--sidebar-active-width, 260px));
+  width: 100%;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
@@ -327,17 +326,14 @@ body {
 
 @media (max-width: 1024px) {
   .sidebar-shell.is-expanded .sidebar-surface { width: 220px; }
-  .page-content { margin-left: 220px; width: calc(100% - 220px); }
 }
 
 @media (max-width: 820px) {
   .sidebar-shell { z-index: 45; }
   .sidebar-shell.is-expanded .sidebar-surface { width: 210px; }
-  .page-content { margin-left: 210px; width: calc(100% - 210px); }
 }
 
 @media (max-width: 640px) {
   .sidebar-shell { z-index: 50; }
   .sidebar-shell .sidebar-surface { width: 78px; min-width: 78px; }
-  .page-content { margin-left: 78px; width: calc(100% - 78px); }
 }
