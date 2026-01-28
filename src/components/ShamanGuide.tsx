@@ -50,27 +50,34 @@ export default function ShamanGuide() {
   return (
     <div style={{ position: "relative", width: 220, height: 220 }}>
       <canvas ref={auraRef} style={{ position: "absolute", top: 0, left: 0, width: 220, height: 220, zIndex: 1, pointerEvents: "none" }} />
-      {/* SVG du Merlin chamanique inspiré des équations */}
+      {/* Structure géométrique animée inspirée des équations du site */}
       <svg width={220} height={220} viewBox="0 0 220 220" style={{ position: "absolute", top: 0, left: 0, zIndex: 2 }}>
-        {/* Corps spiralé */}
-        <path d="M110 140 Q120 120 110 100 Q100 80 110 60" stroke="#C5A059" strokeWidth="4" fill="none" />
-        {/* Orbites autour de la tête */}
-        <ellipse cx="110" cy="70" rx="32" ry="12" fill="none" stroke="#6d77c4" strokeWidth="1.5" opacity="0.5" />
-        <ellipse cx="110" cy="70" rx="22" ry="6" fill="none" stroke="#C5A059" strokeWidth="1.2" opacity="0.4" />
-        {/* Tête sage, expression bienveillante */}
-        <ellipse cx="110" cy="70" rx="18" ry="18" fill="#C5A059" stroke="#fffbe6" strokeWidth="2" />
-        {/* Yeux doux */}
-        <ellipse cx="104" cy="72" rx="2.2" ry="3.2" fill="#2d2233" />
-        <ellipse cx="116" cy="72" rx="2.2" ry="3.2" fill="#2d2233" />
-        {/* Sourire bienveillant */}
-        <path d="M106 80 Q110 85 114 80" stroke="#2d2233" strokeWidth="1.5" fill="none" />
-        {/* Bâton quantique */}
-        <rect x="107" y="120" width="6" height="38" rx="2.5" fill="#C5A059" stroke="#fffbe6" strokeWidth="1" />
-        <circle cx="110" cy="160" r="7" fill="#6d77c4" opacity="0.7" />
-        {/* Spirale d'énergie dans la main */}
-        <path d="M110 140 q8 8 16 0 q-8 -8 0 -16" stroke="#6d77c4" strokeWidth="2" fill="none" opacity="0.7" />
-        {/* Cape translucide */}
-        <path d="M90 140 Q110 200 130 140" fill="#6d77c4" opacity="0.13" />
+        {/* Spirale logarithmique */}
+        <path d={(() => {
+          let d = "M110 110 ";
+          const a = 4.5;
+          const b = 0.22;
+          for (let t = 0; t < 4 * Math.PI; t += 0.08) {
+            const r = a * Math.exp(b * t);
+            const x = 110 + r * Math.cos(t);
+            const y = 110 + r * Math.sin(t);
+            d += `L${x.toFixed(2)} ${y.toFixed(2)} `;
+          }
+          return d;
+        })()} stroke="#C5A059" strokeWidth="2.5" fill="none" />
+        {/* Orbites elliptiques */}
+        <ellipse cx="110" cy="110" rx="60" ry="24" fill="none" stroke="#6d77c4" strokeWidth="1.5" opacity="0.5" />
+        <ellipse cx="110" cy="110" rx="38" ry="12" fill="none" stroke="#C5A059" strokeWidth="1.2" opacity="0.4" />
+        {/* Points sur orbite */}
+        {Array.from({ length: 7 }).map((_, i) => {
+          const angle = (i / 7) * 2 * Math.PI;
+          const x = 110 + 60 * Math.cos(angle);
+          const y = 110 + 24 * Math.sin(angle);
+          return <circle key={i} cx={x} cy={y} r={4} fill="#C5A059" opacity="0.7" />;
+        })}
+        {/* Centre lumineux */}
+        <circle cx="110" cy="110" r="13" fill="#fffbe6" opacity="0.9" />
+        <circle cx="110" cy="110" r="8" fill="#6d77c4" opacity="0.25" />
       </svg>
     </div>
   );
