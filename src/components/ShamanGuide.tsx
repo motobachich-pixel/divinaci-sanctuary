@@ -2,7 +2,8 @@
 import React, { useRef, useEffect } from "react";
 
 // Personnage chamanique animé SVG + Canvas (aura, particules)
-export default function ShamanGuide() {
+// intensity: 0 (calme) à 1 (très intense)
+export default function ShamanGuide({ intensity = 0.3 }: { intensity?: number }) {
   const auraRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -22,11 +23,16 @@ export default function ShamanGuide() {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2 + 18;
       const time = Date.now() * 0.002;
+      // Couleur dynamique selon intensité
+      const base = [197, 160, 89];
+      const accent = [109, 119, 196];
+      const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+      const color = (t: number) => `rgba(${Math.round(lerp(base[0], accent[0], t))},${Math.round(lerp(base[1], accent[1], t))},${Math.round(lerp(base[2], accent[2], t))},`;
       // Halo pulsant
       for (let i = 0; i < 3; i++) {
         ctx.beginPath();
         ctx.arc(cx, cy, 60 + i * 10 + Math.sin(time + i) * 6, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(197,160,89,${0.13 - i * 0.03})`;
+        ctx.strokeStyle = color(intensity) + `${0.13 - i * 0.03})`;
         ctx.lineWidth = 8 - i * 2;
         ctx.stroke();
       }
@@ -38,7 +44,7 @@ export default function ShamanGuide() {
         const y = cy + Math.sin(angle) * r;
         ctx.beginPath();
         ctx.arc(x, y, 2.2 + Math.sin(time * 2 + p) * 0.7, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(197,160,89,0.22)";
+        ctx.fillStyle = color(intensity) + "0.22)";
         ctx.fill();
       }
       animationId = requestAnimationFrame(animate);
