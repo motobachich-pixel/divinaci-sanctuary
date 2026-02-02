@@ -10,7 +10,7 @@ export default function ClientFloatingShaman({ intention = "Bienvenue dans l'esp
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const tRef = useRef(0);
   useEffect(() => {
-    let animId;
+    let animId: number;
     const animate = () => {
       tRef.current += 0.012;
       setPos({
@@ -20,7 +20,7 @@ export default function ClientFloatingShaman({ intention = "Bienvenue dans l'esp
       animId = requestAnimationFrame(animate);
     };
     animate();
-    return () => cancelAnimationFrame(animId);
+    return () => cancelAnimationFrame(animId as number);
   }, []);
   return (
     <div style={{ position: "fixed", right: 32 + pos.x, bottom: 32 + pos.y, zIndex: 30, pointerEvents: "none", transition: "right 0.2s, bottom 0.2s" }}>

@@ -10,8 +10,9 @@
     "check:server": "node scripts/checkServer.mjs"
   },
   "dependencies": {
-    "next": "16.1.4",
+    "next": "^16.1.6",
     "openai": "^6.16.0",
+    "qrcode": "^1.5.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-icons": "^5.5.0",

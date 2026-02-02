@@ -83,7 +83,6 @@ export default function ShamanGuide({ intensity = 0.3 }: { intensity?: number })
         })}
         {/* Centre lumineux */}
         <circle cx="110" cy="110" r="13" fill="#fffbe6" opacity="0.9" />
-        <circle cx="110" cy="110" r="8" fill="#6d77c4" opacity="0.25" />
       </svg>
     </div>
   );

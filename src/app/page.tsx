@@ -1,29 +1,80 @@
 "use client";
-
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import dynamic from "next/dynamic";
-
-const ShamanGuide = dynamic(() => import("../components/ShamanGuide"), { ssr: false });
-
-const celestialWisdom = [
-  "L'équilibre réside dans l'harmonie cosmique",
-  "La connaissance illumine l'infini",
-  "Dans le silence réside la sagesse universelle",
-  "L'énergie circule entre les étoiles",
-  "Chaque atome porte l'essence d'USULDIVINACI",
-];
-
-const mainAction = { icon: "✦", label: "Commencer le voyage céleste", desc: "Entrez dans l'espace sacré du dialogue" };
+import Image from "next/image";
+import { useContext } from "react";
+import { LangContext } from "../components/LangProvider";
 
 export default function Home() {
-  const [currentWisdom, setCurrentWisdom] = useState(0);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const geometryCanvasRef = useRef<HTMLCanvasElement>(null);
+  const { t } = useContext(LangContext);
+  return (
+    <div style={{
+      minHeight: "100vh",
+      width: "100vw",
+      background: "linear-gradient(135deg, #0a0907 0%, #050505 50%, #0a0907 100%)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      position: "relative"
+    }}>
+      <div style={{
+        zIndex: 2,
+        background: "rgba(10,9,7,0.92)",
+        borderRadius: "18px",
+        boxShadow: "0 2px 32px 0 rgba(0,0,0,0.12)",
+        padding: "2.5rem 1.5rem",
+        maxWidth: 420,
+        textAlign: "center"
+      }}>
+        <h1 style={{
+          fontFamily: "var(--font-cinzel), serif",
+          color: "#C5A059",
+          fontWeight: 400,
+          fontSize: "2.2rem",
+          letterSpacing: "0.08em",
+          marginBottom: "1.2rem"
+        }}>
+          {t?.home?.title || "DIVINACI"}
+        </h1>
+        <p style={{
+          color: "#e9e0c9",
+          fontFamily: "var(--font-montserrat), sans-serif",
+          fontSize: "1.1rem",
+          marginBottom: "1.5rem"
+        }}>
+          {t?.home?.subtitle || "A new divinatory experience is coming soon."}
+        </p>
+        <Image
+          src="/under-construction.png"
+          alt="Under Construction"
+          width={220}
+          height={220}
+          style={{ margin: "0 auto 1.5rem auto", borderRadius: "12px", boxShadow: "0 4px 24px rgba(197,160,89,0.15)" }}
+        />
+        <div style={{
+          color: "#C5A059",
+          fontFamily: "var(--font-cinzel), serif",
+          fontSize: "1.1rem",
+          fontWeight: 300,
+          marginTop: "1.2rem"
+        }}>
+          {t?.home?.celestialWisdom?.[0] || "The stars are aligning..."}
+        </div>
+        <div style={{
+          color: "#e9e0c9",
+          fontSize: "0.95rem",
+          marginTop: "1.5rem",
+          opacity: 0.7
+        }}>
+          USULDIVINACI spirit · Geometry · Wisdom · Light
+        </div>
+      </div>
+    </div>
+  );
+}
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentWisdom((prev) => (prev + 1) % celestialWisdom.length);
+      setCurrentWisdom((prev) => (prev + 1) % t.home.celestialWisdom.length);
     }, 6000);
     return () => clearInterval(interval);
   }, []);
@@ -432,26 +483,12 @@ export default function Home() {
         width: "100%",
         padding: "2.5rem 1.5rem 2.5rem 1.5rem"
       }}>
-        <h1 className="hero-title" style={{marginBottom: "0.5rem"}}>USULDIVINACI</h1>
-        <p className="hero-subtitle" style={{marginBottom: "1.2rem"}}>Votre compagnon de sagesse céleste et de réflexion profonde</p>
+        <h1 className="hero-title" style={{marginBottom: "0.5rem"}}>{t.home.title}</h1>
+        <p className="hero-subtitle" style={{marginBottom: "1.2rem"}}>{t.home.subtitle}</p>
         <div className="wisdom-rotating" key={currentWisdom} style={{marginBottom: "1.5rem"}}>
-          {celestialWisdom[currentWisdom]}
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "2.5rem" }}>
-          <Link href="/chat" className="action-card" style={{ minWidth: 260, maxWidth: 340, width: "100%", fontSize: "1.1rem", padding: "0.7rem 1rem" }}>
-            <span className="action-icon" style={{ fontSize: "2.2rem" }}>{mainAction.icon}</span>
-            <span className="action-title">{mainAction.label}</span>
-            <span className="action-desc">{mainAction.desc}</span>
-          </Link>
+          {t.home.celestialWisdom[currentWisdom]}
         </div>
 
-        {/* Personnage chamanique dynamique */}
-        <div id="shamanic-guide" style={{ display: "flex", justifyContent: "center", margin: "2.5rem 0 1.5rem 0", minHeight: 220 }}>
-          <ShamanGuide />
-        </div>
-        <div className="footer-wisdom">
-          Alignement · Dynamisme · Intention · Luminosité
-        </div>
       </div>
     </div>
   );
