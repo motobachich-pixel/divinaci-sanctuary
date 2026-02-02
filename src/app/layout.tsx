@@ -4,7 +4,6 @@ import "./globals.css";
 
 
 
-import ClientFloatingShaman from "../components/ClientFloatingShaman";
 import GeometryCanvasBackground from "../components/GeometryCanvasBackground";
 import Sidebar from "../components/Sidebar";
 import LanguageSelector from "../components/LanguageSelector";
