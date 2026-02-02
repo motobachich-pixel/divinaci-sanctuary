@@ -67,7 +67,7 @@ export default function Home() {
               transition: "background 0.2s"
             }}
           >
-            Contactez-nous (contact@usuldivinaci.com)
+            Me contacter : contact@usuldivinaci.com
           </a>
           <a
             href="mailto:usuldivinaci@gmail.com"
@@ -86,7 +86,7 @@ export default function Home() {
               transition: "background 0.2s"
             }}
           >
-            Contactez-nous (usuldivinaci@gmail.com)
+            Me contacter : usuldivinaci@gmail.com
           </a>
         </div>
         <div style={{
