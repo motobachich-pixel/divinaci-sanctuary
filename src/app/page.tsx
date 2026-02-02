@@ -1,12 +1,9 @@
 "use client";
 import Image from "next/image";
-import { useContext } from "react";
-import { LangContext } from "../components/LangProvider";
-
 
 export default function Home() {
   return (
-    <div style={{
+    <main style={{
       minHeight: "100vh",
       width: "100vw",
       background: "linear-gradient(135deg, #0a0907 0%, #050505 50%, #0a0907 100%)",
@@ -14,53 +11,73 @@ export default function Home() {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      position: "relative"
+      padding: "0 1rem"
     }}>
-      <div style={{
-        zIndex: 2,
-        background: "rgba(10,9,7,0.92)",
-        borderRadius: "18px",
-        boxShadow: "0 2px 32px 0 rgba(0,0,0,0.12)",
-        padding: "2.5rem 1.5rem",
-        maxWidth: 420,
-        textAlign: "center"
+      <section style={{
+        background: "rgba(10,9,7,0.96)",
+        borderRadius: 20,
+        boxShadow: "0 4px 32px 0 rgba(0,0,0,0.18)",
+        padding: "3rem 2rem 2.5rem 2rem",
+        maxWidth: 480,
+        width: "100%",
+        textAlign: "center",
+        margin: "2rem 0"
       }}>
+        <Image
+          src="/under-construction.png"
+          alt="Under Construction"
+          width={180}
+          height={180}
+          style={{ margin: "0 auto 1.5rem auto", borderRadius: "14px", boxShadow: "0 4px 24px rgba(197,160,89,0.15)" }}
+        />
         <h1 style={{
           fontFamily: "var(--font-cinzel), serif",
           color: "#C5A059",
           fontWeight: 700,
-          fontSize: "2.2rem",
-          letterSpacing: "0.08em",
-          marginBottom: "1.2rem"
+          fontSize: "2.5rem",
+          letterSpacing: "0.09em",
+          marginBottom: "1.1rem"
         }}>
-          DIVINACI
+          Bienvenue sur DIVINACI
         </h1>
         <p style={{
           color: "#e9e0c9",
           fontFamily: "var(--font-montserrat), sans-serif",
-          fontSize: "1.15rem",
-          marginBottom: "1.5rem"
+          fontSize: "1.18rem",
+          marginBottom: "1.7rem"
         }}>
-          Le site est en réparation.<br />Nous revenons bientôt avec une nouvelle expérience divinatoire.<br /><br />The site is under maintenance.<br />We will be back soon with a new divinatory experience.
+          Votre espace de guidance, d’intuition et de lumière.<br />
+          <span style={{ color: "#C5A059", fontWeight: 500 }}>Site en rénovation — nouvelle expérience bientôt disponible !</span>
         </p>
-        <Image
-          src="/under-construction.png"
-          alt="Under Construction"
-          width={220}
-          height={220}
-          style={{ margin: "0 auto 1.5rem auto", borderRadius: "12px", boxShadow: "0 4px 24px rgba(197,160,89,0.15)" }}
-        />
+        <a
+          href="mailto:contact@usuldivinaci.com"
+          style={{
+            display: "inline-block",
+            background: "linear-gradient(90deg, #C5A059 60%, #e9e0c9 100%)",
+            color: "#0a0907",
+            fontFamily: "var(--font-cinzel), serif",
+            fontWeight: 600,
+            fontSize: "1.08rem",
+            borderRadius: 30,
+            padding: "0.7rem 2.2rem",
+            textDecoration: "none",
+            boxShadow: "0 2px 12px rgba(197,160,89,0.13)",
+            marginTop: 18,
+            transition: "background 0.2s"
+          }}
+        >
+          Contactez-nous
+        </a>
         <div style={{
           color: "#C5A059",
           fontFamily: "var(--font-cinzel), serif",
-          fontSize: "1.1rem",
+          fontSize: "1.05rem",
           fontWeight: 300,
-          marginTop: "1.2rem"
+          marginTop: "2.2rem"
         }}>
-          USULDIVINACI spirit · Geometry · Wisdom · Light
+          USULDIVINACI · Guidance · Géométrie · Lumière
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
-}
 }
