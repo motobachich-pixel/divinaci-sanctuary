@@ -50,25 +50,46 @@ export default function Chat() {
           Le chat sera bientôt de retour avec de nouvelles fonctionnalités.<br />
           <span style={{ color: "#C5A059", fontWeight: 500 }}>Merci de votre patience !</span>
         </p>
-        <a
-          href="mailto:contact@usuldivinaci.com"
-          style={{
-            display: "inline-block",
-            background: "linear-gradient(90deg, #C5A059 60%, #e9e0c9 100%)",
-            color: "#0a0907",
-            fontFamily: "var(--font-cinzel), serif",
-            fontWeight: 600,
-            fontSize: "1.08rem",
-            borderRadius: 30,
-            padding: "0.7rem 2.2rem",
-            textDecoration: "none",
-            boxShadow: "0 2px 12px rgba(197,160,89,0.13)",
-            marginTop: 18,
-            transition: "background 0.2s"
-          }}
-        >
-          Contactez-nous
-        </a>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", marginBottom: 8 }}>
+          <a
+            href="mailto:contact@usuldivinaci.com"
+            style={{
+              display: "inline-block",
+              background: "linear-gradient(90deg, #C5A059 60%, #e9e0c9 100%)",
+              color: "#0a0907",
+              fontFamily: "var(--font-cinzel), serif",
+              fontWeight: 600,
+              fontSize: "1.08rem",
+              borderRadius: 30,
+              padding: "0.7rem 2.2rem",
+              textDecoration: "none",
+              boxShadow: "0 2px 12px rgba(197,160,89,0.13)",
+              marginTop: 18,
+              transition: "background 0.2s"
+            }}
+          >
+            Contactez-nous (contact@usuldivinaci.com)
+          </a>
+          <a
+            href="mailto:usuldivinaci@gmail.com"
+            style={{
+              display: "inline-block",
+              background: "linear-gradient(90deg, #C5A059 60%, #e9e0c9 100%)",
+              color: "#0a0907",
+              fontFamily: "var(--font-cinzel), serif",
+              fontWeight: 600,
+              fontSize: "1.08rem",
+              borderRadius: 30,
+              padding: "0.7rem 2.2rem",
+              textDecoration: "none",
+              boxShadow: "0 2px 12px rgba(197,160,89,0.13)",
+              marginTop: 0,
+              transition: "background 0.2s"
+            }}
+          >
+            Contactez-nous (usuldivinaci@gmail.com)
+          </a>
+        </div>
         <div style={{
           color: "#C5A059",
           fontFamily: "var(--font-cinzel), serif",
